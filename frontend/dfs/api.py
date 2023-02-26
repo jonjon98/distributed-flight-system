@@ -14,7 +14,6 @@ def sendToJava(serverIP, marshalled_data):
   ### send to java server code here
 
   return "Return Value"
-  pass
 
 def callAPI_queryID(serverIP: str, src: str, dest: str):
   # format data in a dict to be sent for marshalling
