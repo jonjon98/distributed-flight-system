@@ -7,16 +7,19 @@ from setuptools.command.install import install
 class install_config_dir(install):
     user_options = install.user_options + [
         ('serverIP=', None, 'IP of flight booking server to connect to.'),
+        ('serverPort=', None, 'Port of flight booking server to connect to.'),
         ('semantics=', None, 'Semantics to use to transfer information (1 for at-least-once and 2 for at-most-once).'),
     ]           
 
     def initialize_options(self):          
         install.initialize_options(self)   
         self.serverIP = None
+        self.serverPort = None
         self.semantics = None
 
     def finalize_options(self):                   
         print("value of serverIP is", self.serverIP)
+        print("value of serverPort is", self.serverPort)
         print("value of semantics is", self.semantics)
         install.finalize_options(self)
 
@@ -24,6 +27,8 @@ class install_config_dir(install):
         # Use inputs from pip install's "--install-option"
         global serverIP
         serverIP = self.serverIP
+        global serverPort
+        serverPort = self.serverPort
         global semantics
         semantics = self.semantics
 
@@ -40,6 +45,7 @@ class install_config_dir(install):
         configs_data = {}
         
         configs_data["serverIP"] = str(self.serverIP)
+        configs_data["serverPort"] = str(self.serverPort)
 
         if int(self.semantics) == 1:
             configs_data["semantics"] = "at-least-once"
