@@ -28,7 +28,8 @@ def callAPI_queryID(serverIP: str, src: str, dest: str):
   unmarshalled_flightID = unmarshal(marshalled_flightID)
   return unmarshalled_flightID
 
-def callAPI_queryDetails(serverIP: str, flightID: str):
+def callAPI_queryDetails(serverIP: str, flightID: str):\
+  # format data in a dict to be sent for marshalling
   data = {}
   data["command"] = "queryDetails"
   data["flightID"] = flightID
@@ -42,6 +43,7 @@ def callAPI_queryDetails(serverIP: str, flightID: str):
   return unmarshalled_flightDetails
 
 def callAPI_reserve(serverIP: str, flightID: str, noOfSeats: str):
+  # format data in a dict to be sent for marshalling
   data = {}
   data["command"] = "reserve"
   data["flightID"] = flightID
@@ -55,7 +57,19 @@ def callAPI_reserve(serverIP: str, flightID: str, noOfSeats: str):
   unmarshalled_reservationDetails = unmarshal(marshalled_reservationDetails)
   return unmarshalled_reservationDetails
 
+def callAPI_retrieve(serverIP: str, bookingID: str):
+  # format data in a dict to be sent for marshalling
+  data = {}
+  data["command"] = "retrieve"
+  data["bookingID"] = bookingID
 
+  # marshal the data
+  marshalled_data = marshal(data)
+  marshalled_retrieveDetails = sendToJava(serverIP, marshalled_data)
+
+  # unmarshal the data and return
+  unmarshalled_retrieveDetails = unmarshal(marshalled_retrieveDetails)
+  return unmarshalled_retrieveDetails
 
 def callAPI_setSemantics(serverIP: str, semantics: str):
   # format data in a dict to be sent for marshalling

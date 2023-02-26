@@ -7,7 +7,7 @@ from pathlib import Path
 # third party library imports
 
 # my own library imports (call the conntion apis)
-from api import callAPI_queryID, callAPI_queryDetails, callAPI_reserve, callAPI_setSemantics
+from api import callAPI_queryID, callAPI_queryDetails, callAPI_reserve, callAPI_retrieve, callAPI_setSemantics
 
 # defining path variables
 dfs_dir_path = Path.home() / ".dfs"
@@ -90,12 +90,14 @@ def reserve(args):
 	reservationDetails = callAPI_reserve(configs_data["serverIP"], flightID, noOfSeat)
 	print("Reservation Details: " + str(reservationDetails))
 
-
 def subscribe():
 	pass
 
-def retrieve():
-	pass
+def retrieve(args):
+	bookingID = args.bookingID
+	configs_data = read_config()
+	retrieveDetails = callAPI_retrieve(configs_data["serverIP"], bookingID)
+	print("Reservation Details: " + retrieveDetails)
 
 def cancel():
 	pass
@@ -177,7 +179,7 @@ def main() -> None:
 	parser_retrieve = subparsers.add_parser('retrieve', help="Retrieves booking information based on booking ID.")
 
 	parser_retrieve.add_argument(
-		"flightID", type=str,
+		"bookingID", type=str,
 		help="ID of the booking"
 	)
 
@@ -187,7 +189,7 @@ def main() -> None:
 	parser_cancel = subparsers.add_parser('cancel', help="Cancels seat reservation based on booking ID.")
 
 	parser_cancel.add_argument(
-		"flightID", type=str,
+		"bookingID", type=str,
 		help="ID of the booking"
 	)
 
