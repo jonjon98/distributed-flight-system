@@ -7,7 +7,7 @@ from pathlib import Path
 # third party library imports
 
 # my own library imports (call the conntion apis)
-from api import callAPI_queryID, callAPI_queryDetails, callAPI_reserve, callAPI_retrieve, callAPI_cancel, callAPI_setSemantics
+from api import callAPI_queryID, callAPI_queryDetails, callAPI_reserve, callAPI_subscribe, callAPI_retrieve, callAPI_cancel, callAPI_setSemantics
 
 # defining path variables
 dfs_dir_path = Path.home() / ".dfs"
@@ -85,25 +85,30 @@ def queryDetails(args):
 
 def reserve(args):
 	flightID = args.flightID
-	noOfSeat = args.noOfSeats
+	noOfSeat = int(args.noOfSeats)
 	configs_data = read_config()
 	reservationDetails = callAPI_reserve(configs_data["serverIP"], flightID, noOfSeat)
 	print("Reservation Details: " + str(reservationDetails))
 
-def subscribe():
+def subscribe(args):
+	flightID = args.flightID
+	interval = int(args.interval)
+	configs_data = read_config()
+	callAPI_subscribe(configs_data["serverIP"], flightID, interval)
+	print("Subcribed for " + str(interval) + " minutes.")
 	pass
 
 def retrieve(args):
 	bookingID = args.bookingID
 	configs_data = read_config()
 	retrieveDetails = callAPI_retrieve(configs_data["serverIP"], bookingID)
-	print("Reservation Details: " + retrieveDetails)
+	print("Reservation Details: " + str(retrieveDetails))
 
 def cancel(args):
 	bookingID = args.bookingID
 	configs_data = read_config()
 	cancelDetails = callAPI_cancel(configs_data["serverIP"], bookingID)
-	print("Reservation Details: " + cancelDetails)
+	print("Reservation Details: " + str(cancelDetails))
 
 def config(args):
 	if not (args.serverIP or args.semantics): # if there are no flags provided, then just print contents of config.json file
@@ -157,7 +162,7 @@ def main() -> None:
 	)
 
 	parser_reserve.add_argument(
-		"noOfSeats", type=str,
+		"noOfSeats", type=int,
 		help="Number of seats to reserve."
 	)
 
@@ -172,7 +177,7 @@ def main() -> None:
 	)
 
 	parser_subscribe.add_argument(
-		"interval", type=str,
+		"interval", type=int,
 		help="Monitoring interval in minutes for callback monitoring."
 	)
 

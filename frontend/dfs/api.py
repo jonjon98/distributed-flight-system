@@ -1,14 +1,17 @@
 # standard library imports
+import time
 
 # third party library imports
 
 # my own library imports
 from marshalling import marshal, unmarshal
 
+### means need to add code to send to java server
+
 def sendToJava(serverIP, marshalled_data):
   print("serverIP: " + serverIP)
   print("marshalled_data: " + str(marshalled_data))
-  # send to java server code here
+  ### send to java server code here
 
   return "Return Value"
   pass
@@ -28,7 +31,7 @@ def callAPI_queryID(serverIP: str, src: str, dest: str):
   unmarshalled_flightID = unmarshal(marshalled_flightID)
   return unmarshalled_flightID
 
-def callAPI_queryDetails(serverIP: str, flightID: str):\
+def callAPI_queryDetails(serverIP: str, flightID: str):
   # format data in a dict to be sent for marshalling
   data = {}
   data["command"] = "queryDetails"
@@ -42,7 +45,7 @@ def callAPI_queryDetails(serverIP: str, flightID: str):\
   unmarshalled_flightDetails = unmarshal(marshalled_flightDetails)
   return unmarshalled_flightDetails
 
-def callAPI_reserve(serverIP: str, flightID: str, noOfSeats: str):
+def callAPI_reserve(serverIP: str, flightID: str, noOfSeats: int):
   # format data in a dict to be sent for marshalling
   data = {}
   data["command"] = "reserve"
@@ -56,6 +59,16 @@ def callAPI_reserve(serverIP: str, flightID: str, noOfSeats: str):
   # unmarshal the data and return
   unmarshalled_reservationDetails = unmarshal(marshalled_reservationDetails)
   return unmarshalled_reservationDetails
+
+def callAPI_subscribe(serverIP: str, flightID: str, interval: int):
+  start_time = time.time()
+  end_time = start_time + (interval * 60)
+  while time.time() < end_time:
+    print("Monitoring for " + str(int((end_time - time.time()) // 60) + 1) + " more minutes...")
+    ### monitor callback from java server
+
+    time.sleep(1)
+  
 
 def callAPI_retrieve(serverIP: str, bookingID: str):
   # format data in a dict to be sent for marshalling
@@ -99,6 +112,3 @@ def callAPI_setSemantics(serverIP: str, semantics: str):
   # unmarshal the data and return
   unmarshalled_ack = unmarshal(marshalled_ack)
   return unmarshalled_ack
-
-  
-  
