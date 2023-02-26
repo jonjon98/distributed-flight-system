@@ -17,6 +17,7 @@ dfs_certificate_path = dfs_dir_path / "consolidate.pem"
 
 # default values for config.json
 serverIP = "localhost"
+serverPort = "12345"
 semantics = "at-least-once"
 
 # defining all loading functions
@@ -26,18 +27,20 @@ def read_config() -> dict: # reads branch info from config.json file in .dfs dir
 	configs.close() 
 	return configs_data
 
-def write_config(serverIP: str, semantics: str) -> dict: # writes branch info from config.json file in .dfs directory in $HOME directory
+def write_config(serverIP: str, serverPort: str, semantics: str) -> dict: # writes branch info from config.json file in .dfs directory in $HOME directory
 	# Data to be written, do a read_config first to get the data currently in the config.json file
 	configs_data = load_config()
 	if serverIP:
 		configs_data["serverIP"] = str(serverIP)
+	if serverPort:
+		configs_data["serverPort"] = str(serverPort)
 	if semantics:
 		if int(semantics) == 1:
 			configs_data["semantics"] = "at-least-once"
 		elif int(semantics) == 2:
 			configs_data["semantics"] = "at-most-once"
 		
-		print("Semantics changed: ", callAPI_setSemantics(configs_data["serverIP"], configs_data["semantics"]))
+		print("Semantics changed: ", callAPI_setSemantics(configs_data["serverIP"], int(configs_data["serverPort"]), configs_data["semantics"]))
 	
 	# Serializing json
 	json_object = json.dumps(configs_data, indent=4)
@@ -52,12 +55,14 @@ def load_config() -> dict:
 	try:
 		configs_data = read_config()
 		configs_data["serverIP"] 
+		configs_data["serverPort"] 
 		configs_data["semantics"]
 	except (FileNotFoundError, KeyError, json.decoder.JSONDecodeError) as e:
 		print("No config.json file detected or config.json is of wrong format, creating default config.json now.", file=sys.stderr)
 		configs_data = {}
         
 		configs_data["serverIP"] = serverIP
+		configs_data["serverPort"] = serverPort
 		configs_data["semantics"] = semantics
         
     # Serializing json
@@ -74,47 +79,46 @@ def queryID(args):
 	source = args.source
 	destination = args.destination
 	configs_data = read_config()
-	flightID = callAPI_queryID(configs_data["serverIP"], source, destination)
+	flightID = callAPI_queryID(configs_data["serverIP"], int(configs_data["serverPort"]), source, destination)
 	print("Flight ID: " + flightID)
 
 def queryDetails(args):
 	flightID = args.flightID
 	configs_data = read_config()
-	flightDetails = callAPI_queryDetails(configs_data["serverIP"], flightID)
+	flightDetails = callAPI_queryDetails(configs_data["serverIP"], int(configs_data["serverPort"]), flightID)
 	print("Flight Details: " + str(flightDetails))
 
 def reserve(args):
 	flightID = args.flightID
 	noOfSeat = int(args.noOfSeats)
 	configs_data = read_config()
-	reservationDetails = callAPI_reserve(configs_data["serverIP"], flightID, noOfSeat)
+	reservationDetails = callAPI_reserve(configs_data["serverIP"], int(configs_data["serverPort"]), flightID, noOfSeat)
 	print("Reservation Details: " + str(reservationDetails))
 
 def subscribe(args):
 	flightID = args.flightID
 	interval = int(args.interval)
 	configs_data = read_config()
-	callAPI_subscribe(configs_data["serverIP"], flightID, interval)
+	callAPI_subscribe(configs_data["serverIP"], int(configs_data["serverPort"]), flightID, interval)
 	print("Subcribed for " + str(interval) + " minutes.")
-	pass
 
 def retrieve(args):
 	bookingID = args.bookingID
 	configs_data = read_config()
-	retrieveDetails = callAPI_retrieve(configs_data["serverIP"], bookingID)
+	retrieveDetails = callAPI_retrieve(configs_data["serverIP"], int(configs_data["serverPort"]), bookingID)
 	print("Reservation Details: " + str(retrieveDetails))
 
 def cancel(args):
 	bookingID = args.bookingID
 	configs_data = read_config()
-	cancelDetails = callAPI_cancel(configs_data["serverIP"], bookingID)
+	cancelDetails = callAPI_cancel(configs_data["serverIP"], int(configs_data["serverPort"]), bookingID)
 	print("Reservation Details: " + str(cancelDetails))
 
 def config(args):
-	if not (args.serverIP or args.semantics): # if there are no flags provided, then just print contents of config.json file
+	if not (args.serverIP or args.serverPort or args.semantics): # if there are no flags provided, then just print contents of config.json file
 		print(json.dumps(load_config(), indent=4), file=sys.stderr)
 	else: # overwrite config.json with the provided flags and prints the contents of the updated config.json file
-		print(json.dumps(write_config(args.serverIP, args.semantics), indent=4), file=sys.stderr)
+		print(json.dumps(write_config(args.serverIP, args.serverPort, args.semantics), indent=4), file=sys.stderr)
 
 # Main function
 def main() -> None:
@@ -209,6 +213,11 @@ def main() -> None:
 	parser_config.add_argument(
 		"--serverIP",
 		help="Flag to overwrite IP of server stored in config.json"
+	)
+
+	parser_config.add_argument(
+		"--serverPort",
+		help="Flag to overwrite port of server stored in config.json"
 	)
 
 	parser_config.add_argument(
