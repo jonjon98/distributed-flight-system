@@ -71,6 +71,20 @@ def callAPI_retrieve(serverIP: str, bookingID: str):
   unmarshalled_retrieveDetails = unmarshal(marshalled_retrieveDetails)
   return unmarshalled_retrieveDetails
 
+def callAPI_cancel(serverIP: str, bookingID: str):
+  # format data in a dict to be sent for marshalling
+  data = {}
+  data["command"] = "cancel"
+  data["bookingID"] = bookingID
+
+  # marshal the data
+  marshalled_data = marshal(data)
+  marshalled_cancelDetails = sendToJava(serverIP, marshalled_data)
+
+  # unmarshal the data and return
+  unmarshalled_cancelDetails = unmarshal(marshalled_cancelDetails)
+  return unmarshalled_cancelDetails
+
 def callAPI_setSemantics(serverIP: str, semantics: str):
   # format data in a dict to be sent for marshalling
   data = {}

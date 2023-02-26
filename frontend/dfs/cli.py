@@ -7,7 +7,7 @@ from pathlib import Path
 # third party library imports
 
 # my own library imports (call the conntion apis)
-from api import callAPI_queryID, callAPI_queryDetails, callAPI_reserve, callAPI_retrieve, callAPI_setSemantics
+from api import callAPI_queryID, callAPI_queryDetails, callAPI_reserve, callAPI_retrieve, callAPI_cancel, callAPI_setSemantics
 
 # defining path variables
 dfs_dir_path = Path.home() / ".dfs"
@@ -99,8 +99,11 @@ def retrieve(args):
 	retrieveDetails = callAPI_retrieve(configs_data["serverIP"], bookingID)
 	print("Reservation Details: " + retrieveDetails)
 
-def cancel():
-	pass
+def cancel(args):
+	bookingID = args.bookingID
+	configs_data = read_config()
+	cancelDetails = callAPI_cancel(configs_data["serverIP"], bookingID)
+	print("Reservation Details: " + cancelDetails)
 
 def config(args):
 	if not (args.serverIP or args.semantics): # if there are no flags provided, then just print contents of config.json file
