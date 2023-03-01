@@ -8,7 +8,7 @@ import java.nio.charset.StandardCharsets;
 
 public class serverEntity {
     private static final int PORT = 12345;
-    private static final int MAX_PACKET_SIZE = 1024;
+    public static final int MAX_PACKET_SIZE = 1024;
 
     public static void run() throws IOException{
         // Create server socket
@@ -65,7 +65,6 @@ public class serverEntity {
 
 //        System.out.println("bytesRead is "+ bytesRead);
         while ((bytesRead = in.read(buffer)) != -1){
-
             out.write(buffer, 0, bytesRead);
             System.out.println("After reading, bytesRead is "+ bytesRead);
             if (bytesRead < buffer.length){
