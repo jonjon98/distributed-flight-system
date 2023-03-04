@@ -7,7 +7,7 @@ from pathlib import Path
 # third party library imports
 
 # my own library imports (call the conntion apis)
-from api import callAPI_queryID, callAPI_queryDetails, callAPI_reserve, callAPI_subscribe, callAPI_retrieve, callAPI_cancel, callAPI_setSemantics
+from .api import callAPI_queryID, callAPI_queryDetails, callAPI_reserve, callAPI_subscribe, callAPI_retrieve, callAPI_cancel, callAPI_setSemantics
 
 # defining path variables
 dfs_dir_path = Path.home() / ".dfs"
@@ -19,6 +19,8 @@ dfs_certificate_path = dfs_dir_path / "consolidate.pem"
 serverIP = "localhost"
 serverPort = "12345"
 semantics = "at-least-once"
+
+commandID = str(0)
 
 # defining all loading functions
 def read_config() -> dict: # reads branch info from config.json file in .dfs directory in $HOME directory
@@ -79,39 +81,39 @@ def queryID(args):
 	source = args.source
 	destination = args.destination
 	configs_data = read_config()
-	flightID = callAPI_queryID(configs_data["serverIP"], int(configs_data["serverPort"]), source, destination)
+	flightID = callAPI_queryID(configs_data["serverIP"], int(configs_data["serverPort"]), commandID, source, destination)
 	print("Flight ID: " + flightID)
 
 def queryDetails(args):
 	flightID = args.flightID
 	configs_data = read_config()
-	flightDetails = callAPI_queryDetails(configs_data["serverIP"], int(configs_data["serverPort"]), flightID)
+	flightDetails = callAPI_queryDetails(configs_data["serverIP"], int(configs_data["serverPort"]), commandID, flightID)
 	print("Flight Details: " + str(flightDetails))
 
 def reserve(args):
 	flightID = args.flightID
 	noOfSeat = int(args.noOfSeats)
 	configs_data = read_config()
-	reservationDetails = callAPI_reserve(configs_data["serverIP"], int(configs_data["serverPort"]), flightID, noOfSeat)
+	reservationDetails = callAPI_reserve(configs_data["serverIP"], int(configs_data["serverPort"]), commandID, flightID, noOfSeat)
 	print("Reservation Details: " + str(reservationDetails))
 
 def subscribe(args):
 	flightID = args.flightID
 	interval = int(args.interval)
 	configs_data = read_config()
-	callAPI_subscribe(configs_data["serverIP"], int(configs_data["serverPort"]), flightID, interval)
+	callAPI_subscribe(configs_data["serverIP"], int(configs_data["serverPort"]), commandID, flightID, interval)
 	print("Subcribed for " + str(interval) + " minutes.")
 
 def retrieve(args):
 	bookingID = args.bookingID
 	configs_data = read_config()
-	retrieveDetails = callAPI_retrieve(configs_data["serverIP"], int(configs_data["serverPort"]), bookingID)
+	retrieveDetails = callAPI_retrieve(configs_data["serverIP"], int(configs_data["serverPort"]), commandID, bookingID)
 	print("Reservation Details: " + str(retrieveDetails))
 
 def cancel(args):
 	bookingID = args.bookingID
 	configs_data = read_config()
-	cancelDetails = callAPI_cancel(configs_data["serverIP"], int(configs_data["serverPort"]), bookingID)
+	cancelDetails = callAPI_cancel(configs_data["serverIP"], int(configs_data["serverPort"]), commandID, bookingID)
 	print("Reservation Details: " + str(cancelDetails))
 
 def config(args):

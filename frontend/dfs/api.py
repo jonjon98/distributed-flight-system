@@ -6,7 +6,7 @@ import socket
 # third party library imports
 
 # my own library imports
-from marshalling import marshal, unmarshal
+from .marshalling import marshal, unmarshal
 
 ### means need to add code to send to java server
 
@@ -24,31 +24,22 @@ def send_request(serverIP: str, serverPort: int, request: bytes):
         print("Response received")
     return response
 
-def build_request(request): # I think this should be the mashalling
-    # TODO: Implement request building logic
-    return json.dumps(request, indent=2).encode('utf-8')
-    # return bytes(request, "UTF-8")
-
-def handle_response(response):
-    # TODO: Implement response handling logic
-    print(response.decode())
-
 def sendToJava(serverIP: str, serverPort: int, marshalled_data: bytes):
   print("serverIP: " + serverIP)
   print("marshalled_data: " + str(marshalled_data))
 
   ### send to java server code here
   print("Sending Request")
-  request = build_request(marshalled_data)
+  request = marshalled_data
   response = send_request(serverIP, serverPort, request)
-  # handle_response(response)
 
   return response.decode() # decode should be unmarshalling
 #####
 
-def callAPI_queryID(serverIP: str, serverPort: int, src: str, dest: str):
+def callAPI_queryID(serverIP: str, serverPort: int, commandID: str, src: str, dest: str):
   # format data in a dict to be sent for marshalling
   data = {}
+  data["id"] = commandID
   data["command"] = "queryID"
   data["source"] = src
   data["destination"] = dest
@@ -61,9 +52,10 @@ def callAPI_queryID(serverIP: str, serverPort: int, src: str, dest: str):
   unmarshalled_flightID = unmarshal(marshalled_flightID)
   return unmarshalled_flightID
 
-def callAPI_queryDetails(serverIP: str, serverPort: int, flightID: str):
+def callAPI_queryDetails(serverIP: str, serverPort: int, commandID: str, flightID: str):
   # format data in a dict to be sent for marshalling
   data = {}
+  data["id"] = commandID
   data["command"] = "queryDetails"
   data["flightID"] = flightID
 
@@ -75,9 +67,10 @@ def callAPI_queryDetails(serverIP: str, serverPort: int, flightID: str):
   unmarshalled_flightDetails = unmarshal(marshalled_flightDetails)
   return unmarshalled_flightDetails
 
-def callAPI_reserve(serverIP: str, serverPort: int, flightID: str, noOfSeats: int):
+def callAPI_reserve(serverIP: str, serverPort: int, commandID: str, flightID: str, noOfSeats: int):
   # format data in a dict to be sent for marshalling
   data = {}
+  data["id"] = commandID
   data["command"] = "reserve"
   data["flightID"] = flightID
   data["noOfSeats"] = noOfSeats
@@ -90,7 +83,7 @@ def callAPI_reserve(serverIP: str, serverPort: int, flightID: str, noOfSeats: in
   unmarshalled_reservationDetails = unmarshal(marshalled_reservationDetails)
   return unmarshalled_reservationDetails
 
-def callAPI_subscribe(serverIP: str, serverPort: int, flightID: str, interval: int):
+def callAPI_subscribe(serverIP: str, serverPort: int, commandID: str, flightID: str, interval: int):
   start_time = time.time()
   end_time = start_time + (interval * 60)
   while time.time() < end_time:
@@ -100,9 +93,10 @@ def callAPI_subscribe(serverIP: str, serverPort: int, flightID: str, interval: i
     time.sleep(1)
   
 
-def callAPI_retrieve(serverIP: str, serverPort: int, bookingID: str):
+def callAPI_retrieve(serverIP: str, serverPort: int, commandID: str, bookingID: str):
   # format data in a dict to be sent for marshalling
   data = {}
+  data["id"] = commandID
   data["command"] = "retrieve"
   data["bookingID"] = bookingID
 
@@ -114,9 +108,10 @@ def callAPI_retrieve(serverIP: str, serverPort: int, bookingID: str):
   unmarshalled_retrieveDetails = unmarshal(marshalled_retrieveDetails)
   return unmarshalled_retrieveDetails
 
-def callAPI_cancel(serverIP: str, serverPort: int, bookingID: str):
+def callAPI_cancel(serverIP: str, serverPort: int, commandID: str, bookingID: str):
   # format data in a dict to be sent for marshalling
   data = {}
+  data["id"] = commandID
   data["command"] = "cancel"
   data["bookingID"] = bookingID
 
@@ -128,9 +123,10 @@ def callAPI_cancel(serverIP: str, serverPort: int, bookingID: str):
   unmarshalled_cancelDetails = unmarshal(marshalled_cancelDetails)
   return unmarshalled_cancelDetails
 
-def callAPI_setSemantics(serverIP: str, serverPort: int, semantics: str):
+def callAPI_setSemantics(serverIP: str, serverPort: int, commandID: str, semantics: str):
   # format data in a dict to be sent for marshalling
   data = {}
+  data["id"] = commandID
   data["command"] = "setSemantics"
   data["semantics"] = semantics
 
