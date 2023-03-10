@@ -51,3 +51,7 @@ if __name__ == '__main__':
     request = build_request()
     response = send_request(request)
     handle_response(response)
+
+# 007QueryId0018009Semantics0011
+# 1: at-least-once
+# 2: at_most_once
