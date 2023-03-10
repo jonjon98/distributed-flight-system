@@ -1,5 +1,6 @@
 package Entity;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 public class BookingInfo {
@@ -8,18 +9,32 @@ public class BookingInfo {
     private String flightId;
     private String source;
     private String destination;
-    private Date departureTime;
+    private LocalDateTime departureTime;
     private float airfare;
     private Integer seatsBooked;
 
     public BookingInfo(){
+        this.bookingId = getBookingId();
         this.flightId = getFlightId();
         this.source = getSource();
         this.destination = getDestination();
         this.departureTime = getDepartureTime();
         this.airfare = getAirfare();
         this.seatsBooked = getSeatsBooked();
+    }
 
+    public BookingInfo(String flightId, String source, String destination, LocalDateTime departureTime,
+                       float airfare, int seatsBooked){
+        StringBuilder bookingBuilder = new StringBuilder();
+        bookingBuilder.append(String.format("%02d", seatsBooked));
+        bookingBuilder.append(flightId);
+        this.bookingId = bookingBuilder.toString();
+        this.flightId = flightId;
+        this.source = source;
+        this.destination = destination;
+        this.departureTime = departureTime;
+        this.airfare = airfare;
+        this.seatsBooked = seatsBooked;
     }
 
 
@@ -55,11 +70,11 @@ public class BookingInfo {
         this.destination = destination;
     }
 
-    public Date getDepartureTime() {
+    public LocalDateTime getDepartureTime() {
         return departureTime;
     }
 
-    public void setDepartureTime(Date departureTime) {
+    public void setDepartureTime(LocalDateTime departureTime) {
         this.departureTime = departureTime;
     }
 

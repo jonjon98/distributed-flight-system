@@ -1,20 +1,22 @@
 package Entity;
 
-import com.google.type.DateTime;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 public class FlightInfo {
     private String flightId;
     private String source;
     private String destination;
-    private DateTime departureTime;
+    private LocalDateTime departureTime;
     private float airfare;
     private Integer seatAvail;
 
-    public FlightInfo(String flightId, String source, String destination,
-                      DateTime departureTime, float airfare, Integer seatAvail){
-        this.flightId = flightId;
+    public FlightInfo(String source, String destination,
+                      LocalDateTime departureTime, float airfare, Integer seatAvail){
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyMMddHHmm");
+        this.flightId = departureTime.format(formatter);
         this.source = source;
         this.destination = destination;
         this.departureTime = departureTime;
@@ -47,11 +49,11 @@ public class FlightInfo {
         this.destination = destination;
     }
 
-    public DateTime getDepartureTime() {
+    public LocalDateTime getDepartureTime() {
         return departureTime;
     }
 
-    public void setDepartureTime(DateTime departureTime) {
+    public void setDepartureTime(LocalDateTime departureTime) {
         this.departureTime = departureTime;
     }
 
