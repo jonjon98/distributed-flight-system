@@ -18,7 +18,7 @@ public class UserInfo {
     public UserInfo(String ipAdd, String semantics){
         this.ipAdd = ipAdd;
         this.semantics = semantics;
-        this.responseId = new ArrayList<String>();
+        // this.responseId = new ArrayList<String>();
         this.responseList = new HashMap<String, String>();
         this.callbackFlight = "";
     }
@@ -31,13 +31,13 @@ public class UserInfo {
         this.ipAdd = ipAdd;
     }
 
-    public List<String> getResponseId() {
-        return responseId;
-    }
+    // public List<String> getResponseId() {
+    //     return responseId;
+    // }
 
-    public void setResponseId(List<String> responseId) {
-        this.responseId = responseId;
-    }
+    // public void setResponseId(List<String> responseId) {
+    //     this.responseId = responseId;
+    // }
 
     public void setResponse(String request, String response) {
         this.responseList.put(request, response);
