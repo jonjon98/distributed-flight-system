@@ -1,6 +1,5 @@
 # standard library imports
 import time
-import json
 import socket
 
 # third party library imports
