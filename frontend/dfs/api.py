@@ -32,7 +32,7 @@ def sendToJava(serverIP: str, serverPort: int, marshalled_data: bytes):
   request = marshalled_data
   response = send_request(serverIP, serverPort, request)
 
-  return response.decode() # decode should be unmarshalling
+  return response
 #####
 
 def callAPI_queryID(serverIP: str, serverPort: int, commandID: str, src: str, dest: str):
@@ -66,7 +66,7 @@ def callAPI_queryDetails(serverIP: str, serverPort: int, commandID: str, flightI
   unmarshalled_flightDetails = unmarshal(marshalled_flightDetails)
   return unmarshalled_flightDetails
 
-def callAPI_reserve(serverIP: str, serverPort: int, commandID: str, flightID: str, noOfSeats: int):
+def callAPI_reserve(serverIP: str, serverPort: int, commandID: str, flightID: str, noOfSeats: str):
   # format data in a dict to be sent for marshalling
   data = {}
   data["id"] = commandID
@@ -75,6 +75,7 @@ def callAPI_reserve(serverIP: str, serverPort: int, commandID: str, flightID: st
   data["noOfSeats"] = noOfSeats
 
   # marshal the data
+  print(data)
   marshalled_data = marshal(data)
   marshalled_reservationDetails = sendToJava(serverIP, serverPort, marshalled_data)
 

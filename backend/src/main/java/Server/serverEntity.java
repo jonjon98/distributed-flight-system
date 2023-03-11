@@ -141,11 +141,14 @@ public class serverEntity {
     }
 
     public String handleRequest(HashMap<String, String> request, UserInfo userInfo) {
-        String requestQueryId = request.get("QueryId");
+        String requestId = request.get("id");
+        String requestCommand = request.get("command");
         String response;
-        switch (requestQueryId){
-            case "1":
-                System.out.println("Enter Query 1");
+
+        System.out.println("The requestId is: " + requestId);
+        switch (requestCommand){
+            case "queryID":
+                System.out.println("Enter request queryID");
                 // query flight location
                 response = serverController.getFlightID(
                         request.get("source"),
@@ -153,12 +156,14 @@ public class serverEntity {
                 );
                 break;
 
-            case "2":
+            case "queryDetails":
+                System.out.println("Enter request queryDetails");
                 // query flight info
                 response = serverController.getFlightInfo(request.get("flightId"));
                 break;
 
-            case "3":
+            case "reserve":
+                System.out.println("Enter request reserve");
                 // create flight booking
                 response = serverController.flightBooking(
                         request.get("flightId"),
@@ -166,7 +171,8 @@ public class serverEntity {
                 );
                 break;
 
-            case "4":
+            case "subscribe":
+                System.out.println("Enter request subscribe");
                 // create callback
                 response = serverController.callbackRequest(
                         userInfo.getIpAdd(), request.get("flightId"),
@@ -174,15 +180,25 @@ public class serverEntity {
                 );
                 break;
 
-            case "5":
+            case "retrieve":
+                System.out.println("Enter request retrieve");
                 // retrieve user booking
                 response = serverController.retrieveBooking(request.get("bookingId"));
                 break;
 
-            case "6":
+            case "cancel":
+                System.out.println("Enter request cancel");
                 // cancel user booking
                 response = serverController.cancelBooking(request.get("bookingId"));
                 break;
+            
+            // case "setSemantics":
+            //     System.out.println("Enter request setSemantics");
+            //     // create setSemantics
+            //     response = serverController.setSemantics(
+            //             request.get("setSemantics")
+            //     );
+            //     break;
 
             case "7":
                 // display service page

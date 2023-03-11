@@ -93,22 +93,22 @@ def queryID(args):
 	destination = args.destination
 	configs_data = read_config()
 	flightID = callAPI_queryID(configs_data["serverIP"], int(configs_data["serverPort"]), commandID, source, destination)
-	print("Flight ID: " + flightID)
+	print(flightID)
 	increment_commandID(commandID)
 
 def queryDetails(args):
 	flightID = args.flightID
 	configs_data = read_config()
 	flightDetails = callAPI_queryDetails(configs_data["serverIP"], int(configs_data["serverPort"]), commandID, flightID)
-	print("Flight Details: " + str(flightDetails))
+	print(flightDetails)
 	increment_commandID(commandID)
 
 def reserve(args):
 	flightID = args.flightID
-	noOfSeat = int(args.noOfSeats)
+	noOfSeats = args.noOfSeats
 	configs_data = read_config()
-	reservationDetails = callAPI_reserve(configs_data["serverIP"], int(configs_data["serverPort"]), commandID, flightID, noOfSeat)
-	print("Reservation Details: " + str(reservationDetails))
+	reservationDetails = callAPI_reserve(configs_data["serverIP"], int(configs_data["serverPort"]), commandID, flightID, noOfSeats)
+	print(reservationDetails)
 	increment_commandID(commandID)
 
 def subscribe(args):
@@ -123,14 +123,14 @@ def retrieve(args):
 	bookingID = args.bookingID
 	configs_data = read_config()
 	retrieveDetails = callAPI_retrieve(configs_data["serverIP"], int(configs_data["serverPort"]), commandID, bookingID)
-	print("Reservation Details: " + str(retrieveDetails))
+	print(retrieveDetails)
 	increment_commandID(commandID)
 
 def cancel(args):
 	bookingID = args.bookingID
 	configs_data = read_config()
 	cancelDetails = callAPI_cancel(configs_data["serverIP"], int(configs_data["serverPort"]), commandID, bookingID)
-	print("Reservation Details: " + str(cancelDetails))
+	print(cancelDetails)
 	increment_commandID(commandID)
 
 def config(args):
@@ -186,7 +186,7 @@ def main() -> None:
 	)
 
 	parser_reserve.add_argument(
-		"noOfSeats", type=int,
+		"noOfSeats", type=str,
 		help="Number of seats to reserve."
 	)
 
