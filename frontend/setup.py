@@ -51,6 +51,8 @@ class install_config_dir(install):
             configs_data["semantics"] = "at-least-once"
         elif int(self.semantics) == 2:
             configs_data["semantics"] = "at-most-once"
+
+        configs_data["commandID"] = str(0)
             
         # Serializing json
         json_object = json.dumps(configs_data, indent=4)
