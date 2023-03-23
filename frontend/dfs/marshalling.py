@@ -28,34 +28,9 @@ def marshal(unmarshalled_data):
   return marshalled_data
 
 def unmarshal(marshalled_data):
-  # unmarshal logic
-  unmarshalled_data = {}
-  decoded_marshalled_data = str(marshalled_data.decode('utf-8'))
-  even_decoded_marshalled_data = decoded_marshalled_data[1::2]
+  # unmarshal logic 
+  unmarshalled_data = ""
+  for i in range(1 ,len(marshalled_data), 2):
+    unmarshalled_data += chr(marshalled_data[i])
 
-  idx = 0
-  flag = "key"
-
-  key = ""
-  value = ""
-  while idx != len(even_decoded_marshalled_data):
-    if flag == "key":
-      length = int(even_decoded_marshalled_data[idx]) * 100 + int(even_decoded_marshalled_data[idx + 1]) * 10 + int(even_decoded_marshalled_data[idx + 2])
-      idx += 3
-
-      key = even_decoded_marshalled_data[idx:idx + length]
-      idx += length
-      flag = "value"
-
-    elif flag == "value":
-      length = int(even_decoded_marshalled_data[idx]) * 100 + int(even_decoded_marshalled_data[idx + 1]) * 10 + int(even_decoded_marshalled_data[idx + 2])
-      idx += 3
-
-      value = even_decoded_marshalled_data[idx:idx + length]
-      idx += length
-      unmarshalled_data[key] = value
-      key = ""
-      value = ""
-      flag = "key"
-    
   return unmarshalled_data

@@ -10,7 +10,7 @@ from .marshalling import marshal, unmarshal
 ### means need to add code to send to java server
 
 ##### functions for sending data to Java server
-MAX_PACKET_SIZE = 1024
+MAX_PACKET_SIZE = 2048
 
 def send_request(serverIP: str, serverPort: int, request: bytes):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
