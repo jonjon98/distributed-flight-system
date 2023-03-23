@@ -30,15 +30,15 @@ public class serverController {
 //        System.out.println(displayBuilder);
 //        return displayBuilder.toString();
         String displayService = """
-                Services Provided:\n
-                1. Search for flight ID\n
-                2. Check flight details\n
-                3. Book a flight\n
-                4. Set update for flight ID\n
-                5. Retrieve flight booking information\n
-                6. Cancel existing booking reservation\n
-                7. Previous Page\n\n
-                Service selected (Number only):  
+                \nServices Provided:\n
+                1. Search for flight ID: dfs queryID [source] [destination]\n
+                2. Check flight details: dfs queryDetails [flightID]\n
+                3. Book a flight: dfs reserve [flightID] [numOfSeats]\n
+                4. Set update for flight ID: dfs subscribe [flightID] [requestMinutes]\n
+                5. Retrieve flight booking information: dfs retrieve [bookingID]\n
+                6. Cancel existing booking reservation: dfs cancel [bookingID]\n
+                7. Display current semantics: dfs config\n
+                8. Set semantics: dfs config [at-least-once/at-most-once]
                 """;
         System.out.println(displayService);
         return displayService;
