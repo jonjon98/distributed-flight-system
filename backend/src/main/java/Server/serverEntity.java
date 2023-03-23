@@ -13,7 +13,7 @@ import java.util.HashMap;
 
 public class serverEntity {
     private static final int PORT = 12345;
-    public static final int MAX_PACKET_SIZE = 1024;
+    public static final int MAX_PACKET_SIZE = 2048;
 
     public void run() throws IOException{
         // create serverDatabase
@@ -70,7 +70,7 @@ public class serverEntity {
                     response = currUser.getResponse(requestQuery.toString());
                     // generate reponse if not generated before
                     if (response == null){
-                        System.out.println("Duplicate request, sending stored info...");
+                        // System.out.println("Duplicate request, sending stored info...");
                         response = handleRequest(requestQuery, currUser);
                     }
                     currUser.setResponse(requestQuery.toString(), response);
@@ -200,14 +200,16 @@ public class serverEntity {
             //     );
             //     break;
 
-            case "7":
+            case "displayServices":
                 // display service page
                 response = serverController.displayServicesPage();
                 break;
 
-            case "8":
+            case "config":
                 // display semantics page
-                response = serverController.displaySemanticsPage();
+                // response = serverController.displaySemanticsPage();
+                userInfo.setSemantics(request.get("semantics"));
+                response = userInfo.getSemantics();
                 break;
 
             default:

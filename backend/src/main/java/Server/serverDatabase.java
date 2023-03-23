@@ -30,7 +30,7 @@ public class serverDatabase {
         int cost = 200;
         LocalDateTime start = LocalDateTime.of(year, month, 1, 0, 0);
 
-        for (int i = 0; i < 50; i++) {
+        for (int i = 0; i < 10; i++) {
             LocalDateTime dateTime = start.plusDays(rand.nextInt(0,5)).plusHours(rand.nextInt(0,23)).plusMinutes(rand.nextInt(0,59));
             String dest = destination.get(rand.nextInt(destination.size()));
             float airfare = Math.round(rand.nextFloat() * cost + 200 * 100.0f) / 100.0f;
