@@ -25,6 +25,7 @@ public class serverEntity {
         while (true) {
             try {
                 // Wait for a client to connect
+                System.out.println("waiting to connect...");
                 Socket clientSocket = serverSocket.accept();
                 System.out.println("Client connected: " + clientSocket.getInetAddress()
                         + " at port " + clientSocket.getLocalPort());
@@ -52,17 +53,27 @@ public class serverEntity {
                 System.out.println("Request received");
                 Marshaller marshaller = new Marshaller();
                 HashMap<String, String> requestQuery = marshaller.unmarshall(request);
-                System.out.println("Hashmap "+ requestQuery.toString());
+                System.out.println("Hashmap: "+ requestQuery.toString());
+                System.out.println("Semantics: " + currUser.getSemantics());
                 String response;
                 // check semantics
+                // execute request if semantics is at-least-once
                 if (serverController.checkSemantics(requestQuery, currUser)){
                     // if not duplicate request, handle request
+                    // save the request and its response
                     response = handleRequest(requestQuery, currUser);
+                    currUser.setResponse(requestQuery.toString(), response);
 //                  System.out.println("Response generated as " + response.toString());
                 }
                 else{
-                    // if duplicate request then how
-                    response = null; // to be changed
+                    // if at-most-once request
+                    response = currUser.getResponse(requestQuery.toString());
+                    // generate reponse if not generated before
+                    if (response == null){
+                        System.out.println("Duplicate request, sending stored info...");
+                        response = handleRequest(requestQuery, currUser);
+                    }
+                    currUser.setResponse(requestQuery.toString(), response);
                 }
 
                 //unmarshalling
@@ -130,11 +141,14 @@ public class serverEntity {
     }
 
     public String handleRequest(HashMap<String, String> request, UserInfo userInfo) {
-        String requestQueryId = request.get("QueryId");
+        String requestId = request.get("id");
+        String requestCommand = request.get("command");
         String response;
-        switch (requestQueryId){
-            case "1":
-                System.out.println("Enter Query 1");
+
+        System.out.println("The requestId is: " + requestId);
+        switch (requestCommand){
+            case "queryID":
+                System.out.println("Enter request queryID");
                 // query flight location
                 response = serverController.getFlightID(
                         request.get("source"),
@@ -142,12 +156,14 @@ public class serverEntity {
                 );
                 break;
 
-            case "2":
+            case "queryDetails":
+                System.out.println("Enter request queryDetails");
                 // query flight info
                 response = serverController.getFlightInfo(request.get("flightId"));
                 break;
 
-            case "3":
+            case "reserve":
+                System.out.println("Enter request reserve");
                 // create flight booking
                 response = serverController.flightBooking(
                         request.get("flightId"),
@@ -155,7 +171,8 @@ public class serverEntity {
                 );
                 break;
 
-            case "4":
+            case "subscribe":
+                System.out.println("Enter request subscribe");
                 // create callback
                 response = serverController.callbackRequest(
                         userInfo.getIpAdd(), request.get("flightId"),
@@ -163,15 +180,25 @@ public class serverEntity {
                 );
                 break;
 
-            case "5":
+            case "retrieve":
+                System.out.println("Enter request retrieve");
                 // retrieve user booking
                 response = serverController.retrieveBooking(request.get("bookingId"));
                 break;
 
-            case "6":
+            case "cancel":
+                System.out.println("Enter request cancel");
                 // cancel user booking
                 response = serverController.cancelBooking(request.get("bookingId"));
                 break;
+            
+            // case "setSemantics":
+            //     System.out.println("Enter request setSemantics");
+            //     // create setSemantics
+            //     response = serverController.setSemantics(
+            //             request.get("setSemantics")
+            //     );
+            //     break;
 
             case "7":
                 // display service page

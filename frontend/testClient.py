@@ -33,8 +33,10 @@ def build_request():
     #     value_len = len(value.encode('utf-8'))
     #     marshalled_data += value_len.to_bytes(1, byteorder='big', signed=False)
     #     marshalled_data += value.encode('utf-8')
-    marshalled_data += "007QueryId".encode('utf-8')
-    marshalled_data += "0011".encode('utf-8')
+    marshalled_data += "002id".encode('utf-8')
+    marshalled_data += "00220".encode('utf-8')
+    marshalled_data += "007command".encode('utf-8')
+    marshalled_data += "007queryID".encode('utf-8')
     marshalled_data += "006source".encode('utf-8')
     marshalled_data += "009SINGAPORE".encode('utf-8')
     marshalled_data += "011destination".encode('utf-8')
@@ -51,3 +53,7 @@ if __name__ == '__main__':
     request = build_request()
     response = send_request(request)
     handle_response(response)
+
+# 007QueryId0018009Semantics0011
+# 1: at-least-once
+# 2: at_most_once

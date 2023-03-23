@@ -203,8 +203,10 @@ public class serverController {
     }
 
     public static boolean checkSemantics(HashMap<String, String> requestQuery, UserInfo userInfo){
-        // checkSemantics logic
-        return true;
+        // checkSemantics logic 
+        String semantics = userInfo.getSemantics();
+        if (semantics == "at-least-once") return true;
+        else return false;
     }
 
 
