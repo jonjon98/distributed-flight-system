@@ -13,7 +13,7 @@ import java.util.HashMap;
 
 public class serverEntity {
     private static final int PORT = 12345;
-    public static final int MAX_PACKET_SIZE = 1024;
+    public static final int MAX_PACKET_SIZE = 2048;
 
     public void run() throws IOException{
         // create serverDatabase
