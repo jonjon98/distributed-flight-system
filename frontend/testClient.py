@@ -2,7 +2,7 @@ import socket
 
 HOST = 'localhost'
 PORT = 12345
-MAX_PACKET_SIZE = 1024
+MAX_PACKET_SIZE = 2048
 
 def send_request(request):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -14,6 +14,40 @@ def send_request(request):
         response = s.recv(MAX_PACKET_SIZE)
         print("Response received")
     return response
+
+def queryID(marshalled_data):
+    marshalled_data += "002id".encode('utf-8')
+    marshalled_data += "00220".encode('utf-8')
+    marshalled_data += "007command".encode('utf-8')
+    marshalled_data += "007queryID".encode('utf-8')
+    marshalled_data += "006source".encode('utf-8')
+    marshalled_data += "009SINGAPORE".encode('utf-8')
+    marshalled_data += "011destination".encode('utf-8')
+    marshalled_data += "005CHINA".encode('utf-8')
+
+    return marshalled_data
+
+def displayServices(marshalled_data):
+    marshalled_data += "002id".encode('utf8')
+    marshalled_data += "00231".encode('utf8')
+    marshalled_data += "007command".encode('utf8')
+    marshalled_data += "015displayServices".encode('utf8')
+
+    return marshalled_data
+
+def setSemantics(marshalled_data):
+    marshalled_data += "002id".encode('utf8')
+    marshalled_data += "00246".encode('utf8')
+    marshalled_data += "007command".encode('utf8')
+    marshalled_data += "006config".encode('utf8')
+    marshalled_data += "009semantics".encode('utf8')
+    # marshalled_data += "013at-least-once".encode('utf8')
+    marshalled_data += "012at-most-once".encode('utf8')
+    # marshalled_data += "010atmostonce".encode('utf8')
+    print("length: ", len(marshalled_data))
+
+    return marshalled_data
+
 
 def build_request():
     # TODO: Implement request building logic
@@ -33,14 +67,10 @@ def build_request():
     #     value_len = len(value.encode('utf-8'))
     #     marshalled_data += value_len.to_bytes(1, byteorder='big', signed=False)
     #     marshalled_data += value.encode('utf-8')
-    marshalled_data += "002id".encode('utf-8')
-    marshalled_data += "00220".encode('utf-8')
-    marshalled_data += "007command".encode('utf-8')
-    marshalled_data += "007queryID".encode('utf-8')
-    marshalled_data += "006source".encode('utf-8')
-    marshalled_data += "009SINGAPORE".encode('utf-8')
-    marshalled_data += "011destination".encode('utf-8')
-    marshalled_data += "005CHINA".encode('utf-8')
+
+    # marshalled_data = queryID(marshalled_data)
+    # marshalled_data = displayServices(marshalled_data)
+    marshalled_data = setSemantics(marshalled_data)
     return marshalled_data
 
 def handle_response(response):

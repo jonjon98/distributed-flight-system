@@ -15,24 +15,12 @@ public class Marshaller {
 
     public static int MAX_INT_LENGTH = 3;
     public byte[] marshall(String response){
-        // iterate through the hashmap
-        // for each key value, find len and at as string
         StringBuilder responseBuilder = new StringBuilder();
-//        for(Map.Entry<String, String> param: response.entrySet()){
-//            // find len
-//            int keyLen = param.getKey().length();
-//            responseBuilder.append(String.format("%03d", keyLen));
-//            responseBuilder.append(param.getKey());
-//
-//            int valLen = param.getKey().length();
-//            responseBuilder.append(String.format("%03d", valLen));
-//            responseBuilder.append(param.getValue());
-//
-//        }
-        String key = "response";
-        int keyLen = key.length();
-        responseBuilder.append(String.format("%03d", keyLen));
-        responseBuilder.append(key);
+
+//        String key = "response";
+//        int keyLen = key.length();
+//        responseBuilder.append(String.format("%03d", keyLen));
+//        responseBuilder.append(key);
 
         int reponseLen = response.length();
         responseBuilder.append(String.format("%03d", reponseLen));
