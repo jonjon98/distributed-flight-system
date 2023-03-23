@@ -10,18 +10,33 @@ from .marshalling import marshal, unmarshal
 ### means need to add code to send to java server
 
 ##### functions for sending data to Java server
+MAX_RETRIES = 3
+RETRY_DELAY = 10  # seconds
 MAX_PACKET_SIZE = 2048
 
 def send_request(serverIP: str, serverPort: int, request: bytes):
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.connect((serverIP, serverPort))
-        s.sendall(request)
-        # s.sendall(b'\0')
-        print("Message Sent!")
-        # s.shutdown(socket.SHUT_WR)
-        response = s.recv(MAX_PACKET_SIZE)
-        print("Response received")
-    return response
+    
+  with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+    s.settimeout(10)  # set a timeout of 10 seconds
+    retries = 0
+    while retries < MAX_RETRIES:
+        try:
+            s.connect((serverIP, serverPort))
+            s.sendall(request)
+            print("Message Sent!")
+            response = s.recv(MAX_PACKET_SIZE)
+            print("Response received")
+            break  # exit loop if response is received
+        except socket.timeout:
+            print(f"Timeout reached, retrying ({retries+1}/{MAX_RETRIES})...")
+            retries += 1
+            time.sleep(RETRY_DELAY)  # wait before retrying
+
+    if retries == MAX_RETRIES:
+        print("Max retries reached, giving up.")
+        return None
+    else:
+        return response
 
 def sendToJava(serverIP: str, serverPort: int, marshalled_data: bytes):
   print("serverIP: " + serverIP)
