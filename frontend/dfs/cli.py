@@ -20,6 +20,8 @@ serverIP = "localhost"
 serverPort = "12345"
 semantics = "at-least-once"
 
+commandID = str(0)
+
 # defining all loading functions
 def read_config() -> dict: # reads branch info from config.json file in .dfs directory in $HOME directory
 	configs = open(dfs_config_path)
@@ -27,7 +29,7 @@ def read_config() -> dict: # reads branch info from config.json file in .dfs dir
 	configs.close() 
 	return configs_data
 
-def write_config(serverIP: str, serverPort: str, semantics: str, commandID: str) -> dict: # writes branch info from config.json file in .dfs directory in $HOME directory
+def write_config(serverIP: str, serverPort: str, semantics: str) -> dict: # writes branch info from config.json file in .dfs directory in $HOME directory
 	# Data to be written, do a read_config first to get the data currently in the config.json file
 	configs_data = load_config()
 	if serverIP:
@@ -40,7 +42,7 @@ def write_config(serverIP: str, serverPort: str, semantics: str, commandID: str)
 		elif int(semantics) == 2:
 			configs_data["semantics"] = "at-most-once"
 		
-	print("Semantics changed: ", callAPI_setSemantics(configs_data["serverIP"], int(configs_data["serverPort"]), commandID, configs_data["semantics"]))
+		print("Semantics changed: ", callAPI_setSemantics(configs_data["serverIP"], int(configs_data["serverPort"]), configs_data["semantics"]))
 	
 	# Serializing json
 	json_object = json.dumps(configs_data, indent=4)
@@ -75,41 +77,25 @@ def load_config() -> dict:
 
 	return configs_data
 
-def increment_commandID(commandID: str):
-	configs_data = load_config()
-	configs_data["commandID"] = str(int(commandID) + 1)
-
-	# Serializing json
-	json_object = json.dumps(configs_data, indent=4)
-	
-	# Writing to sample.json
-	with open(dfs_config_path, "w") as outfile:
-		outfile.write(json_object) 
-
-commandID = read_config()["commandID"]
-
 def queryID(args):
 	source = args.source
 	destination = args.destination
 	configs_data = read_config()
 	flightID = callAPI_queryID(configs_data["serverIP"], int(configs_data["serverPort"]), commandID, source, destination)
-	print(flightID)
-	increment_commandID(commandID)
+	print("Flight ID: " + flightID)
 
 def queryDetails(args):
 	flightID = args.flightID
 	configs_data = read_config()
 	flightDetails = callAPI_queryDetails(configs_data["serverIP"], int(configs_data["serverPort"]), commandID, flightID)
-	print(flightDetails)
-	increment_commandID(commandID)
+	print("Flight Details: " + str(flightDetails))
 
 def reserve(args):
 	flightID = args.flightID
-	noOfSeats = args.noOfSeats
+	noOfSeat = int(args.noOfSeats)
 	configs_data = read_config()
-	reservationDetails = callAPI_reserve(configs_data["serverIP"], int(configs_data["serverPort"]), commandID, flightID, noOfSeats)
-	print(reservationDetails)
-	increment_commandID(commandID)
+	reservationDetails = callAPI_reserve(configs_data["serverIP"], int(configs_data["serverPort"]), commandID, flightID, noOfSeat)
+	print("Reservation Details: " + str(reservationDetails))
 
 def subscribe(args):
 	flightID = args.flightID
@@ -117,29 +103,25 @@ def subscribe(args):
 	configs_data = read_config()
 	callAPI_subscribe(configs_data["serverIP"], int(configs_data["serverPort"]), commandID, flightID, interval)
 	print("Subcribed for " + str(interval) + " minutes.")
-	increment_commandID(commandID)
 
 def retrieve(args):
 	bookingID = args.bookingID
 	configs_data = read_config()
 	retrieveDetails = callAPI_retrieve(configs_data["serverIP"], int(configs_data["serverPort"]), commandID, bookingID)
-	print(retrieveDetails)
-	increment_commandID(commandID)
+	print("Reservation Details: " + str(retrieveDetails))
 
 def cancel(args):
 	bookingID = args.bookingID
 	configs_data = read_config()
 	cancelDetails = callAPI_cancel(configs_data["serverIP"], int(configs_data["serverPort"]), commandID, bookingID)
-	print(cancelDetails)
-	increment_commandID(commandID)
+	print("Reservation Details: " + str(cancelDetails))
 
 def config(args):
 	if not (args.serverIP or args.serverPort or args.semantics): # if there are no flags provided, then just print contents of config.json file
 		print(json.dumps(load_config(), indent=4), file=sys.stderr)
 	else: # overwrite config.json with the provided flags and prints the contents of the updated config.json file
-		print(json.dumps(write_config(args.serverIP, args.serverPort, args.semantics, commandID), indent=4), file=sys.stderr)
-	increment_commandID(commandID)
-	
+		print(json.dumps(write_config(args.serverIP, args.serverPort, args.semantics), indent=4), file=sys.stderr)
+
 # Main function
 def main() -> None:
 	# create the top-level parser
@@ -186,7 +168,7 @@ def main() -> None:
 	)
 
 	parser_reserve.add_argument(
-		"noOfSeats", type=str,
+		"noOfSeats", type=int,
 		help="Number of seats to reserve."
 	)
 

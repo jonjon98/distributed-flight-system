@@ -2,14 +2,12 @@ package Entity;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.HashMap;
 
 public class UserInfo {
 
     private String ipAdd;
     private List<String> responseId;
     private String semantics;
-    private HashMap<String, String> responseList;
 
     // callbackArr contains flightId
     private String callbackFlight;
@@ -18,8 +16,7 @@ public class UserInfo {
     public UserInfo(String ipAdd, String semantics){
         this.ipAdd = ipAdd;
         this.semantics = semantics;
-        // this.responseId = new ArrayList<String>();
-        this.responseList = new HashMap<String, String>();
+        this.responseId = new ArrayList<String>();
         this.callbackFlight = "";
     }
 
@@ -31,22 +28,12 @@ public class UserInfo {
         this.ipAdd = ipAdd;
     }
 
-    // public List<String> getResponseId() {
-    //     return responseId;
-    // }
-
-    // public void setResponseId(List<String> responseId) {
-    //     this.responseId = responseId;
-    // }
-
-    public void setResponse(String request, String response) {
-        this.responseList.put(request, response);
+    public List<String> getResponseId() {
+        return responseId;
     }
 
-    public String getResponse(String request){
-        String response = responseList.get(request);
-        System.out.println("response: " + response);
-        return response;
+    public void setResponseId(List<String> responseId) {
+        this.responseId = responseId;
     }
 
     public String getSemantics() {
