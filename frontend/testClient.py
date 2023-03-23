@@ -2,7 +2,7 @@ import socket
 
 HOST = 'localhost'
 PORT = 12345
-MAX_PACKET_SIZE = 1024
+MAX_PACKET_SIZE = 2048
 
 def send_request(request):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
