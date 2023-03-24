@@ -137,8 +137,8 @@ def config(args):
 	if not (args.serverIP or args.serverPort or args.semantics): # if there are no flags provided, then just print contents of config.json file
 		print(json.dumps(load_config(), indent=4), file=sys.stderr)
 	else: # overwrite config.json with the provided flags and prints the contents of the updated config.json file
+		increment_commandID(commandID)
 		print(json.dumps(write_config(args.serverIP, args.serverPort, args.semantics, commandID), indent=4), file=sys.stderr)
-	increment_commandID(commandID)
 	
 # Main function
 def main() -> None:
