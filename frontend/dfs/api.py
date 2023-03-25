@@ -15,28 +15,29 @@ RETRY_DELAY = 10  # seconds
 MAX_PACKET_SIZE = 2048
 
 def send_request(serverIP: str, serverPort: int, request: bytes):
-    
-  with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-    s.settimeout(10)  # set a timeout of 10 seconds
-    retries = 0
-    while retries < MAX_RETRIES:
-        try:
-            s.connect((serverIP, serverPort))
-            s.sendall(request)
-            print("Message Sent!")
-            response = s.recv(MAX_PACKET_SIZE)
-            print("Response received")
-            break  # exit loop if response is received
-        except socket.timeout:
-            print(f"Timeout reached, retrying ({retries+1}/{MAX_RETRIES})...")
-            retries += 1
-            time.sleep(RETRY_DELAY)  # wait before retrying
-
-    if retries == MAX_RETRIES:
-        print("Max retries reached, giving up.")
-        return None
-    else:
-        return response
+  retries = 0
+  while retries < MAX_RETRIES:
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+      s.settimeout(10)  # set a timeout of 10 seconds
+      try:
+          s.connect((serverIP, serverPort))
+          s.sendall(request)
+          print("Message Sent!")
+          response = s.recv(MAX_PACKET_SIZE)
+          print("Response received")
+          s.close()
+          break  # exit loop if response is received
+      except socket.timeout:
+          print(f"Timeout reached, retrying ({retries+1}/{MAX_RETRIES})...")
+          retries += 1
+          time.sleep(RETRY_DELAY)  # wait before retrying
+      finally:
+          s.close()
+  if retries == MAX_RETRIES:
+      print("Max retries reached, giving up.")
+      return bytearray()
+  else:
+      return response
 
 def sendToJava(serverIP: str, serverPort: int, marshalled_data: bytes):
   print("serverIP: " + serverIP)
