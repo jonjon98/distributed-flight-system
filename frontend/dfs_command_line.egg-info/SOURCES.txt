@@ -1,0 +1,12 @@
+README.md
+setup.py
+dfs/__init__.py
+dfs/api.py
+dfs/cli.py
+dfs/marshalling.py
+dfs_command_line.egg-info/PKG-INFO
+dfs_command_line.egg-info/SOURCES.txt
+dfs_command_line.egg-info/dependency_links.txt
+dfs_command_line.egg-info/entry_points.txt
+dfs_command_line.egg-info/requires.txt
+dfs_command_line.egg-info/top_level.txt

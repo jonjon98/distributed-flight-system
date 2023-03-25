@@ -1,0 +1,46 @@
+Metadata-Version: 2.1
+Name: dfs-command-line
+Version: 0.1
+Summary: A command line interface to allow users to access the distributed flight system APIs.
+Author: Jonathan Yap
+Author-email: yapzh.jon@gmail.com
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.7
+Description-Content-Type: text/markdown
+
+# DFS Command Line Tool
+
+This is a command line tool to be able to access the Distributed Flight system
+
+## Installation
+
+1. Clone the repo by using
+
+```bash
+git clone https://github.com/jonjon98/distributed-flight-system.git
+```
+
+2. Install the package
+
+```bash
+cd <repo path>
+pip install .
+```
+
+
+## Using the CLI command
+```bash
+dfs <subcommand> <appropriate arguments>
+```
+
+Subcommands:
+
+- queryID
+- queryDetails
+- reserve
+- subscribe
+- retrieve
+- cancel
+- config

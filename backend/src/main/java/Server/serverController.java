@@ -116,6 +116,8 @@ public class serverController {
                     flightInformation.append("Number of seats booked: " + booking.getSeatsBooked()+ "\n\n");
                     int seatAvailability = flight.getSeatAvail();
                     flight.setSeatAvail(seatAvailability - booking.getSeatsBooked());
+                    // set callbackChecker = flightId
+                    serverEntity.callbackChecker = flightId;
                     break;
                 }
                 else if(flight.getSeatAvail()==0) {
@@ -132,27 +134,30 @@ public class serverController {
         return flightInformation.toString();
     }
 
-    public static String callbackRequest(String ipAdd, String flightId, int monitorMinutes){
-        UserInfo callbackUser;
-        boolean found = false;
+    public static String createCallback(String flightId, int monitorMinutes, UserInfo callbackUser){
         StringBuilder callbackAck = new StringBuilder();
-        for(UserInfo user: serverDatabase.userInfoArrayList){
-            if(user.getIpAdd().equals(ipAdd)){
-                callbackUser = user;
-
-                for(FlightInfo flight: serverDatabase.flightInfoArrayList){
-                    if(flight.getFlightId().equals(flightId)){
-                        found = true;
-                        callbackUser.setCallbackFlight(flightId);
-                        callbackAck.append("Flight ID "+callbackUser.getCallbackFlight()+" is current being monitored for "+
-                                monitorMinutes + " minutes...\n\n");
-                    }
-                }
+        for(FlightInfo flight: serverDatabase.flightInfoArrayList){
+            // if flightID generated is correct, add UserInfo to callbackHmap
+            if(flight.getFlightId().equals(flightId)){
+                serverDatabase.callbackHmap.get(flightId).add(callbackUser);
+                callbackAck.append("Flight ID "+callbackUser.getCallbackFlight()+" is current being monitored for "+
+                        monitorMinutes + " minutes...\n\n");
+                System.out.println(callbackAck);
             }
         }
-        if(!found){
-            callbackAck.append("The given flight ID does not exist!\n\n");
-        }
+        return callbackAck.toString();
+    }
+
+    public static boolean checkCallback(String flightId){
+        System.out.println("Callback for " + serverDatabase.callbackHmap.get(flightId));
+        return !serverDatabase.callbackHmap.get(flightId).isEmpty();
+    }
+
+    public static String cancelCallback(String flightId, UserInfo callbackUser){
+        StringBuilder callbackAck = new StringBuilder();
+        serverDatabase.callbackHmap.get(flightId).remove(callbackUser);
+        callbackAck.append("Monitoring has stopped\n\n");
+        System.out.println(callbackAck);
         return callbackAck.toString();
     }
 
@@ -203,6 +208,7 @@ public class serverController {
                     }
                 }
                 serverDatabase.bookingInfoArrayList.remove(booking);
+                serverEntity.callbackChecker = booking.getFlightId();
                 break;
             }
         }
