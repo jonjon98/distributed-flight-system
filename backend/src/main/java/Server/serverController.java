@@ -114,6 +114,8 @@ public class serverController {
                             booking.getDepartureTime().format(DateTimeFormatter.ofPattern("EEE, dd/MMM/yyyy - h:mmA")) + "\n");
                     flightInformation.append("Total Airfare: " + booking.getAirfare()+ "\n");
                     flightInformation.append("Number of seats booked: " + booking.getSeatsBooked()+ "\n\n");
+                    int seatAvailability = flight.getSeatAvail();
+                    flight.setSeatAvail(seatAvailability - booking.getSeatsBooked());
                     break;
                 }
                 else if(flight.getSeatAvail()==0) {
@@ -193,6 +195,14 @@ public class serverController {
                         booking.getDepartureTime().format(DateTimeFormatter.ofPattern("EEE, dd/MMM/yyyy - h:mmA")) + "\n");
                 bookingInformation.append("Total Airfare: " + booking.getAirfare()+ "\n");
                 bookingInformation.append("Number of seats booked: " + booking.getSeatsBooked()+ "\n\n");
+
+                for (FlightInfo flight: serverDatabase.flightInfoArrayList){
+                    if (booking.getFlightId().equals(flight.getFlightId())){
+                        int seatAvailability = flight.getSeatAvail();
+                        flight.setSeatAvail(seatAvailability + booking.getSeatsBooked());
+                    }
+                }
+                serverDatabase.bookingInfoArrayList.remove(booking);
                 break;
             }
         }
