@@ -159,15 +159,15 @@ public class serverEntity {
             case "queryDetails":
                 System.out.println("Enter request queryDetails");
                 // query flight info
-                response = serverController.getFlightInfo(request.get("flightId"));
+                response = serverController.getFlightInfo(request.get("flightID"));
                 break;
 
             case "reserve":
                 System.out.println("Enter request reserve");
                 // create flight booking
                 response = serverController.flightBooking(
-                        request.get("flightId"),
-                        Integer.parseInt(request.get("numOfSeats"))
+                        request.get("flightID"),
+                        Integer.parseInt(request.get("noOfSeats"))
                 );
                 break;
 
@@ -183,13 +183,13 @@ public class serverEntity {
             case "retrieve":
                 System.out.println("Enter request retrieve");
                 // retrieve user booking
-                response = serverController.retrieveBooking(request.get("bookingId"));
+                response = serverController.retrieveBooking(request.get("bookingID"));
                 break;
 
             case "cancel":
                 System.out.println("Enter request cancel");
                 // cancel user booking
-                response = serverController.cancelBooking(request.get("bookingId"));
+                response = serverController.cancelBooking(request.get("bookingID"));
                 break;
             
             // case "setSemantics":
