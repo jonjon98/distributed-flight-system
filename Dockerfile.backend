@@ -1,0 +1,6 @@
+FROM cimg/openjdk:19.0.2
+EXPOSE 12345
+RUN sudo mkdir /opt/app
+COPY /backend/src/main/java /opt/app
+WORKDIR "/opt/app"
+CMD ["java", "Main"]

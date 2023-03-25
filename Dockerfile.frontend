@@ -1,0 +1,10 @@
+FROM python:latest
+RUN mkdir /opt/app
+COPY /frontend /opt/app
+WORKDIR "/opt/app"
+RUN pip install urllib3
+RUN pip install charset-normalizer
+RUN pip install certifi
+# have to change the --serverIP of the following command to the ipaddress of the server. I need to figure out how to use the name of the container and let docker resolve using its DNS instead of this
+RUN pip install . --install-option="--serverIP=172.17.0.2" --install-option="--serverPort=12345" --install-option="--semantics=1"
+CMD ["python", "loop.py"]
