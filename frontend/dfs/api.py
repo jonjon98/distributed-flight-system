@@ -50,7 +50,7 @@ def sendToJava(serverIP: str, serverPort: int, marshalled_data: bytes):
 
   return response
 
-def sendRequestSubscribe(serverIP: str, serverPort: int, request: bytes, interval: int):
+def sendRequestSubscribe(serverIP: str, serverPort: int, request: bytes, marshalled_cancelData: bytes, interval: int):
   start_time = time.time()
   end_time = start_time + (interval * 60)
   with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -60,6 +60,7 @@ def sendRequestSubscribe(serverIP: str, serverPort: int, request: bytes, interva
     print("Waiting for " + str(interval) + " minutes...")
     s.settimeout(interval * 60)  # set a timeout of interval minutes
     while time.time() < end_time:
+      # print("Entering while loop")
       try:
         response = s.recv(MAX_PACKET_SIZE)
         if response:
@@ -67,18 +68,23 @@ def sendRequestSubscribe(serverIP: str, serverPort: int, request: bytes, interva
           print(unmarshal(response))
       except socket.timeout:
         pass
+    
     s.close()
+
+  responseCancel = sendRequest(serverIP, serverPort, marshalled_cancelData)
+  print(unmarshal(responseCancel))
+
   print("Subscription ended after " + str(interval) + " minutes.")
   return None
 
-def sendToJavaSubscribe(serverIP: str, serverPort: int, marshalled_data: bytes, interval: int):
+def sendToJavaSubscribe(serverIP: str, serverPort: int, marshalled_data: bytes, marshalled_cancelData: bytes, interval: int):
   print("serverIP: " + serverIP)
   print("marshalled_data: " + str(marshalled_data))
 
   ### send to java server code here
   print("Sending Request")
   request = marshalled_data
-  sendRequestSubscribe(serverIP, serverPort, request, interval)
+  sendRequestSubscribe(serverIP, serverPort, request, marshalled_cancelData, interval)
 
   return None
 
@@ -138,13 +144,16 @@ def callAPI_subscribe(serverIP: str, serverPort: int, commandID: str, flightID: 
   data["command"] = "subscribe"
   data["flightID"] = flightID
   data["interval"] = str(interval)
-  # data["source"] = "SINGAPORE"
-  # data["destination"] = "CHINA"
+
+  cancelData = {}
+  cancelData["command"] = "cancelCallback"
+  cancelData["flightID"] = flightID
 
   # marshal the data
   print(data)
   marshalled_data = marshal(data)
-  sendToJavaSubscribe(serverIP, serverPort, marshalled_data, interval)
+  marshalled_cancelData = marshal(cancelData)
+  sendToJavaSubscribe(serverIP, serverPort, marshalled_data, marshalled_cancelData, interval)
   return None
 
 def callAPI_retrieve(serverIP: str, serverPort: int, commandID: str, bookingID: str):
@@ -181,7 +190,7 @@ def callAPI_setSemantics(serverIP: str, serverPort: int, commandID: str, semanti
   # format data in a dict to be sent for marshalling
   data = {}
   data["id"] = commandID
-  data["command"] = "setSemantics"
+  data["command"] = "config"
   data["semantics"] = semantics
 
 
