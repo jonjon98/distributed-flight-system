@@ -7,6 +7,10 @@ import java.util.HashMap;
 public class UserInfo {
 
     private String ipAdd;
+    private Integer localPort;
+
+
+
     private List<String> responseId;
     private String semantics;
     private HashMap<String, String> responseList;
@@ -15,9 +19,10 @@ public class UserInfo {
     private String callbackFlight;
 
     // create UserInfo per user using IP address
-    public UserInfo(String ipAdd, String semantics){
+    public UserInfo(String ipAdd, Integer localPort, String semantics){
         this.ipAdd = ipAdd;
         this.semantics = semantics;
+        this.localPort = localPort;
         // this.responseId = new ArrayList<String>();
         this.responseList = new HashMap<String, String>();
         this.callbackFlight = "";
@@ -63,5 +68,13 @@ public class UserInfo {
 
     public void setCallbackFlight(String callbackFlight) {
         this.callbackFlight = callbackFlight;
+    }
+
+    public Integer getLocalPort() {
+        return localPort;
+    }
+
+    public void setLocalPort(Integer localPort) {
+        this.localPort = localPort;
     }
 }

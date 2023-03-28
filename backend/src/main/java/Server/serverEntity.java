@@ -1,9 +1,11 @@
 package Server;
 
+import Entity.FlightInfo;
 import Entity.UserInfo;
 import Marshalling.Marshaller;
 
 import java.io.*;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.ByteBuffer;
@@ -14,6 +16,7 @@ import java.util.HashMap;
 public class serverEntity {
     private static final int PORT = 12345;
     public static final int MAX_PACKET_SIZE = 2048;
+    public static String callbackChecker = null;
 
     public void run() throws IOException{
         // create serverDatabase
@@ -44,6 +47,7 @@ public class serverEntity {
                 if (!existingUser){
                     currUser = new UserInfo(
                             clientSocket.getInetAddress().toString(),
+                            clientSocket.getLocalPort(),
                             "at-most-once");
                     serverDatabase.userInfoArrayList.add(currUser);
                 }
@@ -76,7 +80,7 @@ public class serverEntity {
                     currUser.setResponse(requestQuery.toString(), response);
                 }
 
-                //unmarshalling
+                //marshalling
                 byte[] responseByteArr = marshaller.marshall(response);
 
                 // Send response back to client
@@ -89,7 +93,36 @@ public class serverEntity {
             } catch (Exception e) {
                 System.err.println("Error handling client request: " + e);
             }
+
+            // check if callbackChecker is null
+            if(callbackChecker!=null){
+                FlightInfo callbackFlight = null;
+                for(FlightInfo flightInfo: serverDatabase.flightInfoArrayList){
+                    if(flightInfo.getFlightId()==callbackChecker){
+                        callbackFlight = flightInfo;
+                        for(UserInfo callbackUser: serverDatabase.callbackHmap.get(callbackChecker)){
+                            String host = callbackUser.getIpAdd(); // replace with the IP address of the client
+                            int port = callbackUser.getLocalPort(); // replace with the port number the client is listening on
+
+                            try (Socket socket = new Socket(InetAddress.getByName(host), port)) {
+                                OutputStream output = socket.getOutputStream();
+                                String response = callbackFlight.toString();
+                                //marshalling
+                                Marshaller marshaller = new Marshaller();
+                                byte[] responseByteArr = marshaller.marshall(response);
+
+                                // Send response back to client
+                                output.write(responseByteArr);
+                                System.out.println("Callback response sent");
+                            }
+                        }
+                    }
+                }
+                callbackChecker = null;
+            }
         }
+
+
     }
 
     private void send(Socket clientSocket, byte[] response) throws IOException {
@@ -159,37 +192,48 @@ public class serverEntity {
             case "queryDetails":
                 System.out.println("Enter request queryDetails");
                 // query flight info
-                response = serverController.getFlightInfo(request.get("flightId"));
+                response = serverController.getFlightInfo(request.get("flightID"));
                 break;
 
             case "reserve":
                 System.out.println("Enter request reserve");
                 // create flight booking
                 response = serverController.flightBooking(
-                        request.get("flightId"),
-                        Integer.parseInt(request.get("numOfSeats"))
+                        request.get("flightID"),
+                        Integer.parseInt(request.get("noOfSeats"))
                 );
+
                 break;
 
             case "subscribe":
                 System.out.println("Enter request subscribe");
                 // create callback
-                response = serverController.callbackRequest(
-                        userInfo.getIpAdd(), request.get("flightId"),
-                        Integer.parseInt(request.get("requestMinutes"))
+                response = serverController.createCallback(
+                        request.get("flightID"),
+                        Integer.parseInt(request.get("interval")),
+                        userInfo
+                );
+                break;
+
+            case "cancelCallback":
+                System.out.println("Enter cancelCallback");
+                // stop callback
+                response = serverController.cancelCallback(
+                        request.get("flightID"),
+                        userInfo
                 );
                 break;
 
             case "retrieve":
                 System.out.println("Enter request retrieve");
                 // retrieve user booking
-                response = serverController.retrieveBooking(request.get("bookingId"));
+                response = serverController.retrieveBooking(request.get("bookingID"));
                 break;
 
             case "cancel":
                 System.out.println("Enter request cancel");
                 // cancel user booking
-                response = serverController.cancelBooking(request.get("bookingId"));
+                response = serverController.cancelBooking(request.get("bookingID"));
                 break;
             
             // case "setSemantics":
@@ -216,8 +260,7 @@ public class serverEntity {
                 response = "New Query Id? Dont funny leh";
                 System.out.println(response);
         }
-        //TODO
-//        byte[] byteRequest = response.getBytes();
+
         return response;
     }
 

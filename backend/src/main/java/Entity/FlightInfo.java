@@ -25,6 +25,17 @@ public class FlightInfo {
 
     }
 
+    @Override
+    public String toString() {
+        return "The following flight information has been updated:\n" +
+                "Flight ID: " + flightId + "\n" +
+                "Source: " + source + "\n" +
+                "Destination: " + destination + "\n" +
+                "Departure Time: " + departureTime + "\n" +
+                "Airfare: " + airfare + "\n" +
+                "Available Seats: " + seatAvail;
+    }
+
     public String getFlightId() {
         return flightId;
     }
