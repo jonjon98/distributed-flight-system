@@ -50,26 +50,70 @@ def sendToJava(serverIP: str, serverPort: int, marshalled_data: bytes):
 
   return response
 
+def server_program(serverPort: int, end_time):
+    # get the hostname
+    host = "192.168.188.117"
+    port = 23456  # initiate port no above 1024
+
+    server_socket = socket.socket()  # get instance
+    # look closely. The bind() function takes tuple as argument
+    print("Host: " + host)
+    print("Port number: " + str(port))
+    server_socket.bind((host, port))  # bind host address and port together
+
+    # configure how many client the server can listen simultaneously
+    server_socket.listen(1)
+    while time.time() < end_time:
+      server_socket.settimeout(end_time - time.time())
+      try:
+        conn, address = server_socket.accept()  # accept new connection
+        print("Connection from: " + str(address))
+        # receive data stream. it won't accept data packet greater than 1024 bytes
+        data = unmarshal(conn.recv(MAX_PACKET_SIZE))
+        if data:
+          print(str(data))
+      except socket.timeout:
+        pass
+      # data = input(' -> ')
+      # conn.send(data.encode())  # send data to the client
+
+    try:
+      conn.close()  # close the connection
+    except:
+      pass
+
 def sendRequestSubscribe(serverIP: str, serverPort: int, request: bytes, marshalled_cancelData: bytes, interval: int):
   start_time = time.time()
-  end_time = start_time + (interval * 60)
+  end_time = start_time + float(interval * 60)
   with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     s.connect((serverIP, serverPort))
     s.sendall(request)
     print("Subscribe Request Sent!")
     print("Waiting for " + str(interval) + " minutes...")
-    s.settimeout(interval * 60)  # set a timeout of interval minutes
-    while time.time() < end_time:
-      # print("Entering while loop")
-      try:
-        response = s.recv(MAX_PACKET_SIZE)
-        if response:
-          print("Response received")
-          print(unmarshal(response))
-      except socket.timeout:
-        pass
-    
+    s.settimeout(10)  # set a timeout of interval minutes
+    try:
+      response = s.recv(MAX_PACKET_SIZE)
+      if response:
+            print("Response received")
+            print(unmarshal(response))
+    except socket.timeout:
+        print("Timeout for initial connection.")
+
     s.close()
+
+  server_program(serverPort, end_time)
+
+    # while time.time() < end_time:
+    #   # print("Entering while loop")
+    #   try:
+    #     response = s.recv(MAX_PACKET_SIZE)
+    #     if response:
+    #       print("Response received")
+    #       print(unmarshal(response))
+    #   except socket.timeout:
+    #     pass
+    
+    # s.close()
 
   responseCancel = sendRequest(serverIP, serverPort, marshalled_cancelData)
   print(unmarshal(responseCancel))
