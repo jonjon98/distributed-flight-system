@@ -31,8 +31,8 @@ public class FlightInfo {
                 "Flight ID: " + flightId + "\n" +
                 "Source: " + source + "\n" +
                 "Destination: " + destination + "\n" +
-                "Departure Time: " + departureTime + "\n" +
-                "Airfare: " + airfare + "\n" +
+                "Departure Time: " + departureTime.format(DateTimeFormatter.ofPattern("EEE, dd/MMM/yyyy - HH:mm a")) + "\n" +
+                "Airfare: $"+ String.format("%.2f", airfare) + "\n" +
                 "Available Seats: " + seatAvail;
     }
 

@@ -6,6 +6,7 @@ import Marshalling.Marshaller;
 
 import java.io.*;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.ByteBuffer;
@@ -48,7 +49,7 @@ public class serverEntity {
                     currUser = new UserInfo(
                             clientSocket.getInetAddress().toString(),
                             clientSocket.getLocalPort(),
-                            "at-most-once");
+                            "at-least-once");
                     serverDatabase.userInfoArrayList.add(currUser);
                 }
 
@@ -57,8 +58,8 @@ public class serverEntity {
                 System.out.println("Request received");
                 Marshaller marshaller = new Marshaller();
                 HashMap<String, String> requestQuery = marshaller.unmarshall(request);
-                System.out.println("Hashmap: "+ requestQuery.toString());
-                System.out.println("Semantics: " + currUser.getSemantics());
+//                System.out.println("Hashmap: "+ requestQuery.toString());
+//                System.out.println("Semantics: " + currUser.getSemantics());
                 String response;
                 // check semantics
                 // execute request if semantics is at-least-once
@@ -79,7 +80,7 @@ public class serverEntity {
                     }
                     currUser.setResponse(requestQuery.toString(), response);
                 }
-
+//                System.out.println("Before marshalling: "+response);
                 //marshalling
                 byte[] responseByteArr = marshaller.marshall(response);
 
@@ -93,19 +94,31 @@ public class serverEntity {
             } catch (Exception e) {
                 System.err.println("Error handling client request: " + e);
             }
-
+//            System.out.println("Main serverEntity.callbackChecker: "+ callbackChecker);
             // check if callbackChecker is null
+            System.out.print("callbackChecker!=null: "+callbackChecker!=null);
             if(callbackChecker!=null){
                 FlightInfo callbackFlight = null;
                 for(FlightInfo flightInfo: serverDatabase.flightInfoArrayList){
-                    if(flightInfo.getFlightId()==callbackChecker){
+//                    System.out.println("Looping through flighID: "+flightInfo.getFlightId());
+//                    System.out.println("Correct? "+callbackChecker.equals(flightInfo.getFlightId()));
+                    if(callbackChecker.equals(flightInfo.getFlightId())){
+                        System.out.println("Enter sending callback");
                         callbackFlight = flightInfo;
                         for(UserInfo callbackUser: serverDatabase.callbackHmap.get(callbackChecker)){
-                            String host = callbackUser.getIpAdd(); // replace with the IP address of the client
-                            int port = callbackUser.getLocalPort(); // replace with the port number the client is listening on
 
-                            try (Socket socket = new Socket(InetAddress.getByName(host), port)) {
+                            String host = callbackUser.getIpAdd().replace("/", ""); // replace with the IP address of the client
+                            int port = 23456; // replace with the port number the client is listening on
+
+//                            System.out.println("callbackUser.getIpAdd(): "+callbackUser.getIpAdd());
+//                            System.out.println("host: "+host);
+//                            System.out.println("port: "+port);
+
+                            try (Socket socket = new Socket()) {
+                                socket.connect(new InetSocketAddress(InetAddress.getByName(host), port),
+                                        5000);
                                 OutputStream output = socket.getOutputStream();
+//                                System.out.println("Preparing to send");
                                 String response = callbackFlight.toString();
                                 //marshalling
                                 Marshaller marshaller = new Marshaller();
@@ -115,6 +128,9 @@ public class serverEntity {
                                 output.write(responseByteArr);
                                 System.out.println("Callback response sent");
                             }
+                            catch(Exception e){
+                                e.printStackTrace();}
+//                            break;
                         }
                     }
                 }
@@ -140,12 +156,12 @@ public class serverEntity {
     }
 
     private byte[] receive(Socket clientSocket) throws IOException {
-        System.out.println("In receive function");
+//        System.out.println("In receive function");
         InputStream in = clientSocket.getInputStream();
-        System.out.println("After inputStream "+ in);
+//        System.out.println("After inputStream "+ in);
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        System.out.println("After ByteArrayOutputStream");
+//        System.out.println("After ByteArrayOutputStream");
 
         byte[] buffer = new byte[MAX_PACKET_SIZE];
         int bytesRead;
@@ -184,8 +200,8 @@ public class serverEntity {
                 System.out.println("Enter request queryID");
                 // query flight location
                 response = serverController.getFlightID(
-                        request.get("source"),
-                        request.get("destination")
+                        request.get("source").toUpperCase(),
+                        request.get("destination").toUpperCase()
                 );
                 break;
 
@@ -244,10 +260,10 @@ public class serverEntity {
             //     );
             //     break;
 
-            case "displayServices":
-                // display service page
-                response = serverController.displayServicesPage();
-                break;
+//            case "displayServices":
+//                // display service page
+//                response = serverController.displayServicesPage();
+//                break;
 
             case "config":
                 // display semantics page

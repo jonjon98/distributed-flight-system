@@ -1,7 +1,9 @@
 package Entity;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.sql.Timestamp;
 
 public class BookingInfo {
 
@@ -26,9 +28,8 @@ public class BookingInfo {
     public BookingInfo(String flightId, String source, String destination, LocalDateTime departureTime,
                        float airfare, int seatsBooked){
         StringBuilder bookingBuilder = new StringBuilder();
-        bookingBuilder.append(String.format("%02d", seatsBooked));
-        bookingBuilder.append(flightId);
-        this.bookingId = bookingBuilder.toString();
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        this.bookingId = String.valueOf(timestamp.getTime());
         this.flightId = flightId;
         this.source = source;
         this.destination = destination;
