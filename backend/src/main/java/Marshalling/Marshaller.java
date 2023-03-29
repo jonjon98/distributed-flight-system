@@ -22,8 +22,8 @@ public class Marshaller {
 //        responseBuilder.append(String.format("%03d", keyLen));
 //        responseBuilder.append(key);
 
-        int reponseLen = response.length();
-        responseBuilder.append(String.format("%03d", reponseLen));
+//        int reponseLen = response.length();
+//        responseBuilder.append(String.format("%03d", reponseLen));
         responseBuilder.append(response);
 
         byte[] responseByteArr = responseBuilder.toString().getBytes(StandardCharsets.UTF_16BE);
@@ -43,7 +43,7 @@ public class Marshaller {
 
         while(bytesPos < inByteArr.length){
             // extract len of key + string of key
-            System.out.println( inByteArr[bytesPos]);
+//            System.out.println( inByteArr[bytesPos]);
             //allocate first 3 bytes for length
             for(int i = 0; i<MAX_INT_LENGTH; i++){
                 lenBuilder.append((char) inByteArr[bytesPos]);

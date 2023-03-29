@@ -14,58 +14,16 @@ import java.util.Scanner;
 
 public class serverController {
 
-    public static String displayServicesPage(){
-//        StringBuilder displayBuilder = new StringBuilder();
-//        displayBuilder.append("""
-//                Services Provided:\n
-//                1. Search for flight ID\n
-//                2. Check flight details\n
-//                3. Book a flight\n
-//                4. Set update for flight ID\n
-//                5. Retrieve flight booking information\n
-//                6. Cancel existing booking reservation\n
-//                7. Previous Page\n\n
-//                Service selected (Number only):
-//                """);
-//        System.out.println(displayBuilder);
-//        return displayBuilder.toString();
-        String displayService = """
-                \nServices Provided:\n
-                1. Search for flight ID: dfs queryID [source] [destination]\n
-                2. Check flight details: dfs queryDetails [flightID]\n
-                3. Book a flight: dfs reserve [flightID] [numOfSeats]\n
-                4. Set update for flight ID: dfs subscribe [flightID] [requestMinutes]\n
-                5. Retrieve flight booking information: dfs retrieve [bookingID]\n
-                6. Cancel existing booking reservation: dfs cancel [bookingID]\n
-                7. Display current semantics: dfs config\n
-                8. Set semantics: dfs config [at-least-once/at-most-once]
-                """;
-        System.out.println(displayService);
-        return displayService;
-    }
-
-    public static String displaySemanticsPage(){
-        String displaySemantics = """
-                Semantics Option:\n
-                1. at-least-once\n
-                2. at-most-once\n
-                3. Exit\n\n
-                Option selected (Number only):  
-                """;
-        System.out.println(displaySemantics);
-        return displaySemantics;
-    }
-
     public static String getFlightID(String sourcePlace, String destinationPlace){
         StringBuilder flightInformation = new StringBuilder();
 //        System.out.println("serverDatabase.flightInfoArrayList: "+serverDatabase.flightInfoArrayList.toString());
         for(FlightInfo flight: serverDatabase.flightInfoArrayList){
-            System.out.println("sourcePlace: "+sourcePlace);
-            System.out.println("flight.getSource(): "+flight.getSource());
-            System.out.println("destinationPlace: "+destinationPlace);
-            System.out.println("flight.getDestination(): "+flight.getDestination());
-            System.out.println("bool sourcePlace: "+sourcePlace.equals(flight.getSource()));
-            System.out.println("bool destinationPlace: "+destinationPlace.equals(flight.getDestination()));
+//            System.out.println("sourcePlace: "+sourcePlace);
+//            System.out.println("flight.getSource(): "+flight.getSource());
+//            System.out.println("destinationPlace: "+destinationPlace);
+//            System.out.println("flight.getDestination(): "+flight.getDestination());
+//            System.out.println("bool sourcePlace: "+sourcePlace.equals(flight.getSource()));
+//            System.out.println("bool destinationPlace: "+destinationPlace.equals(flight.getDestination()));
             if(sourcePlace.equals(flight.getSource()) && destinationPlace.equals(flight.getDestination())){
                 flightInformation.append("FlightID: "+ flight.getFlightId() +"\n");
                 flightInformation.append("Source: "+ flight.getSource() +"\n");
@@ -81,8 +39,8 @@ public class serverController {
         for(FlightInfo flight: serverDatabase.flightInfoArrayList){
             if(flightId.equals(flight.getFlightId())){
                 flightInformation.append("Departure Time: " +
-                        flight.getDepartureTime().format(DateTimeFormatter.ofPattern("EEE, dd/MMM/yyyy - h:mmA")) + "\n");
-                flightInformation.append("Airfare: "+ flight.getAirfare() +"\n");
+                        flight.getDepartureTime().format(DateTimeFormatter.ofPattern("EEE, dd/MMM/yyyy - HH:mm a")) + "\n");
+                flightInformation.append("Airfare: $"+ String.format("%.2f", flight.getAirfare()) +"\n");
                 flightInformation.append("Seats Availability: "+ flight.getSeatAvail() +"\n\n");
                 break;
             }
@@ -111,13 +69,14 @@ public class serverController {
                     flightInformation.append("Source: " + booking.getSource()+ "\n");
                     flightInformation.append("Destination: " + booking.getDestination()+ "\n");
                     flightInformation.append("Departure Time: " +
-                            booking.getDepartureTime().format(DateTimeFormatter.ofPattern("EEE, dd/MMM/yyyy - h:mmA")) + "\n");
-                    flightInformation.append("Total Airfare: " + booking.getAirfare()+ "\n");
+                            booking.getDepartureTime().format(DateTimeFormatter.ofPattern("EEE, dd/MMM/yyyy - HH:mm a")) + "\n");
+                    flightInformation.append("Total Airfare: $"+ String.format("%.2f", booking.getAirfare()) +"\n");
                     flightInformation.append("Number of seats booked: " + booking.getSeatsBooked()+ "\n\n");
                     int seatAvailability = flight.getSeatAvail();
                     flight.setSeatAvail(seatAvailability - booking.getSeatsBooked());
                     // set callbackChecker = flightId
                     serverEntity.callbackChecker = flightId;
+//                    System.out.println("serverEntity.callbackChecker: "+ serverEntity.callbackChecker);
                     break;
                 }
                 else if(flight.getSeatAvail()==0) {
@@ -140,7 +99,7 @@ public class serverController {
             // if flightID generated is correct, add UserInfo to callbackHmap
             if(flight.getFlightId().equals(flightId)){
                 serverDatabase.callbackHmap.get(flightId).add(callbackUser);
-                callbackAck.append("Flight ID "+callbackUser.getCallbackFlight()+" is current being monitored for "+
+                callbackAck.append("Flight ID "+flightId+" is current being monitored for "+
                         monitorMinutes + " minutes...\n\n");
                 System.out.println(callbackAck);
             }
@@ -148,10 +107,6 @@ public class serverController {
         return callbackAck.toString();
     }
 
-    public static boolean checkCallback(String flightId){
-        System.out.println("Callback for " + serverDatabase.callbackHmap.get(flightId));
-        return !serverDatabase.callbackHmap.get(flightId).isEmpty();
-    }
 
     public static String cancelCallback(String flightId, UserInfo callbackUser){
         StringBuilder callbackAck = new StringBuilder();
@@ -173,8 +128,8 @@ public class serverController {
                 bookingInformation.append("Source: " + booking.getSource()+ "\n");
                 bookingInformation.append("Destination: " + booking.getDestination()+ "\n");
                 bookingInformation.append("Departure Time: " +
-                        booking.getDepartureTime().format(DateTimeFormatter.ofPattern("EEE, dd/MMM/yyyy - h:mmA")) + "\n");
-                bookingInformation.append("Total Airfare: " + booking.getAirfare()+ "\n");
+                        booking.getDepartureTime().format(DateTimeFormatter.ofPattern("EEE, dd/MMM/yyyy - HH:mm a")) + "\n");
+                bookingInformation.append("Total Airfare: $"+ String.format("%.2f", booking.getAirfare()) +"\n");
                 bookingInformation.append("Number of seats booked: " + booking.getSeatsBooked()+ "\n\n");
                 break;
             }
@@ -197,8 +152,8 @@ public class serverController {
                 bookingInformation.append("Source: " + booking.getSource()+ "\n");
                 bookingInformation.append("Destination: " + booking.getDestination()+ "\n");
                 bookingInformation.append("Departure Time: " +
-                        booking.getDepartureTime().format(DateTimeFormatter.ofPattern("EEE, dd/MMM/yyyy - h:mmA")) + "\n");
-                bookingInformation.append("Total Airfare: " + booking.getAirfare()+ "\n");
+                        booking.getDepartureTime().format(DateTimeFormatter.ofPattern("EEE, dd/MMM/yyyy - HH:mm a")) + "\n");
+                bookingInformation.append("Total Airfare: $"+ String.format("%.2f", booking.getAirfare()) +"\n");
                 bookingInformation.append("Number of seats booked: " + booking.getSeatsBooked()+ "\n\n");
 
                 for (FlightInfo flight: serverDatabase.flightInfoArrayList){
@@ -209,6 +164,7 @@ public class serverController {
                 }
                 serverDatabase.bookingInfoArrayList.remove(booking);
                 serverEntity.callbackChecker = booking.getFlightId();
+//                System.out.println("serverEntity.callbackChecker: "+ serverEntity.callbackChecker);
                 break;
             }
         }
