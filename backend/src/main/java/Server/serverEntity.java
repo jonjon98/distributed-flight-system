@@ -5,10 +5,7 @@ import Entity.UserInfo;
 import Marshalling.Marshaller;
 
 import java.io.*;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
+import java.net.*;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -16,6 +13,7 @@ import java.util.HashMap;
 
 public class serverEntity {
     private static final int PORT = 12345;
+    private static  final  int CLIENT_LISTENING_PORT = 23456;
     public static final int MAX_PACKET_SIZE = 2048;
     public static String callbackChecker = null;
 
@@ -23,23 +21,66 @@ public class serverEntity {
         // create serverDatabase
         serverDatabase serverDatabase = new serverDatabase();
 
+
+
+
+
+
+
+
+
+
+
         // Create server socket
-        ServerSocket serverSocket = new ServerSocket(PORT);
+//        ServerSocket serverSocket = new ServerSocket(PORT);
 
         while (true) {
             try {
                 // Wait for a client to connect
                 System.out.println("waiting to connect...");
-                Socket clientSocket = serverSocket.accept();
-                System.out.println("Client connected: " + clientSocket.getInetAddress()
-                        + " at port " + clientSocket.getLocalPort());
+//                Socket clientSocket = serverSocket.accept();
+                // Receive the incoming data
+                // Create a DatagramPacket to hold the incoming data
+                // Create a DatagramSocket to listen for incoming packets
+                DatagramSocket serverSocket = new DatagramSocket(PORT);
+
+                // Create a byte array to store incoming data
+                byte[] buffer = new byte[MAX_PACKET_SIZE];
+                DatagramPacket receivePacket = new DatagramPacket(buffer, buffer.length);
+                serverSocket.receive(receivePacket);
+
+
+
+
+//                System.out.println("Client connected: " + clientSocket.getInetAddress()
+//                        + " at port " + clientSocket.getLocalPort());
+                InetAddress  clientAddress = receivePacket.getAddress();
+                Integer clientPort = receivePacket.getPort();
+                System.out.println("Client connected: " + clientAddress.getHostAddress()
+                        + " at port " + clientPort);
 
 
                 // check if client is existing user
+//                boolean existingUser = false;
+//                UserInfo currUser = null;
+//                for(UserInfo userInfo: serverDatabase.userInfoArrayList){
+//                    if (userInfo.getIpAdd().equals(clientSocket.getInetAddress().toString())){
+//                        existingUser = true;
+//                        currUser = userInfo;
+//                        break;
+//                    }
+//                }
+//                if (!existingUser){
+//                    currUser = new UserInfo(
+//                            clientSocket.getInetAddress().toString(),
+//                            clientSocket.getLocalPort(),
+//                            "at-least-once");
+//                    serverDatabase.userInfoArrayList.add(currUser);
+//                }
                 boolean existingUser = false;
                 UserInfo currUser = null;
                 for(UserInfo userInfo: serverDatabase.userInfoArrayList){
-                    if (userInfo.getIpAdd().equals(clientSocket.getInetAddress().toString())){
+                    if (userInfo.getIpAdd().equals(clientAddress.getHostAddress())){
                         existingUser = true;
                         currUser = userInfo;
                         break;
@@ -47,14 +88,21 @@ public class serverEntity {
                 }
                 if (!existingUser){
                     currUser = new UserInfo(
-                            clientSocket.getInetAddress().toString(),
-                            clientSocket.getLocalPort(),
+                            clientAddress.getHostAddress(),
+                            clientPort,
                             "at-least-once");
                     serverDatabase.userInfoArrayList.add(currUser);
                 }
 
+                // Extract the data from the packet and convert it to a string
+                byte[] request = receivePacket.getData();
+//                request= new byte[](data, 0, receivePacket.getLength());
+
+                // Print the received data
+                System.out.println("Received data: " + request);
                 // Handle client request
-                byte[] request = receive(clientSocket);
+//                String request = new String(data, 0, receivePacket.getLength());
+//                byte[] request = receive(clientSocket);
                 System.out.println("Request received");
                 Marshaller marshaller = new Marshaller();
                 HashMap<String, String> requestQuery = marshaller.unmarshall(request);
@@ -80,23 +128,29 @@ public class serverEntity {
                     }
                     currUser.setResponse(requestQuery.toString(), response);
                 }
-//                System.out.println("Before marshalling: "+response);
+                System.out.println("Before marshalling response: "+response);
                 //marshalling
                 byte[] responseByteArr = marshaller.marshall(response);
 
                 // Send response back to client
-                send(clientSocket, responseByteArr);
+//                send(clientSocket, responseByteArr);
+                // Create a DatagramPacket with the data and client information
+                DatagramPacket sendPacket = new DatagramPacket(responseByteArr, responseByteArr.length, clientAddress, clientPort);
+
+                // Send the packet to the client
+                serverSocket.send(sendPacket);
                 System.out.println("Response sent");
 
                 // Close client socket
-                clientSocket.close();
+//                clientSocket.close();
+                serverSocket.close();
                 System.out.println("Client Socket close");
             } catch (Exception e) {
-                System.err.println("Error handling client request: " + e);
+//                System.err.println("Error handling client request: " + e);
             }
 //            System.out.println("Main serverEntity.callbackChecker: "+ callbackChecker);
             // check if callbackChecker is null
-            System.out.print("callbackChecker!=null: "+callbackChecker!=null);
+//            System.out.print("callbackChecker!=null: "+callbackChecker!=null);
             if(callbackChecker!=null){
                 FlightInfo callbackFlight = null;
                 for(FlightInfo flightInfo: serverDatabase.flightInfoArrayList){
@@ -108,28 +162,40 @@ public class serverEntity {
                         for(UserInfo callbackUser: serverDatabase.callbackHmap.get(callbackChecker)){
 
                             String host = callbackUser.getIpAdd().replace("/", ""); // replace with the IP address of the client
-                            int port = 23456; // replace with the port number the client is listening on
+                            int port = CLIENT_LISTENING_PORT; // replace with the port number the client is listening on
 
 //                            System.out.println("callbackUser.getIpAdd(): "+callbackUser.getIpAdd());
 //                            System.out.println("host: "+host);
 //                            System.out.println("port: "+port);
-
-                            try (Socket socket = new Socket()) {
-                                socket.connect(new InetSocketAddress(InetAddress.getByName(host), port),
-                                        5000);
-                                OutputStream output = socket.getOutputStream();
-//                                System.out.println("Preparing to send");
+                            try {
+                                DatagramSocket socket = new DatagramSocket();
                                 String response = callbackFlight.toString();
                                 //marshalling
                                 Marshaller marshaller = new Marshaller();
                                 byte[] responseByteArr = marshaller.marshall(response);
-
-                                // Send response back to client
-                                output.write(responseByteArr);
-                                System.out.println("Callback response sent");
+                                DatagramPacket sendPacket = new DatagramPacket(responseByteArr, responseByteArr.length, InetAddress.getByName(host), port);
+                                socket.send(sendPacket);
+                                socket.close();
                             }
                             catch(Exception e){
                                 e.printStackTrace();}
+
+//                            try (Socket socket = new Socket()) {
+////                                socket.connect(new InetSocketAddress(InetAddress.getByName(host), port),
+////                                        5000);
+////                                OutputStream output = socket.getOutputStream();
+////                                System.out.println("Preparing to send");
+//                                String response = callbackFlight.toString();
+//                                //marshalling
+//                                Marshaller marshaller = new Marshaller();
+//                                byte[] responseByteArr = marshaller.marshall(response);
+//
+//                                // Send response back to client
+//                                output.write(responseByteArr);
+//                                System.out.println("Callback response sent");
+//                            }
+//                            catch(Exception e){
+//                                e.printStackTrace();}
 //                            break;
                         }
                     }
