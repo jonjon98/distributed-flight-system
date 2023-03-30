@@ -106,7 +106,7 @@ public class Marshaller {
                 keyValCount = 2;
                 break;
 
-            case "queryDetails", "cancelCallback", "retrieve", "cancel":
+            case "queryDetails", "cancelCallback", "retrieve", "cancel", "config":
                 keyValCount = 1;
                 break;
 
