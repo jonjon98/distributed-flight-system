@@ -55,14 +55,17 @@ def server_program(serverPort: int, end_time):
     host = "192.168.188.117"
     port = 23456  # initiate port no above 1024
 
+
     # server_socket = socket.socket()  # get instance
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
     # look closely. The bind() function takes tuple as argument
     print("Host: " + host)
     print("Port number: " + str(port))
     server_socket.bind((host, port))  # bind host address and port together
 
     # configure how many client the server can listen simultaneously
+
     # server_socket.listen(1)
     while time.time() < end_time:
       server_socket.settimeout(end_time - time.time())
@@ -71,6 +74,7 @@ def server_program(serverPort: int, end_time):
         data, address = server_socket.recvfrom(MAX_PACKET_SIZE)  # receive data from client
         print("Received from: " + str(address))
         data = unmarshal(data)
+
         if data:
           print(str(data))
       except socket.timeout:
