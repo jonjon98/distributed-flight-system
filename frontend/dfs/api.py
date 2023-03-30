@@ -17,7 +17,7 @@ MAX_PACKET_SIZE = 2048
 def sendRequest(serverIP: str, serverPort: int, request: bytes):
   retries = 0
   while retries < MAX_RETRIES:
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+    with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
       s.settimeout(10)  # set a timeout of 10 seconds
       try:
           s.connect((serverIP, serverPort))
@@ -55,21 +55,26 @@ def server_program(serverPort: int, end_time):
     host = "192.168.188.117"
     port = 23456  # initiate port no above 1024
 
-    server_socket = socket.socket()  # get instance
+
+    # server_socket = socket.socket()  # get instance
+    server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
     # look closely. The bind() function takes tuple as argument
     print("Host: " + host)
     print("Port number: " + str(port))
     server_socket.bind((host, port))  # bind host address and port together
 
     # configure how many client the server can listen simultaneously
-    server_socket.listen(1)
+
+    # server_socket.listen(1)
     while time.time() < end_time:
       server_socket.settimeout(end_time - time.time())
       try:
-        conn, address = server_socket.accept()  # accept new connection
-        print("Connection from: " + str(address))
-        # receive data stream. it won't accept data packet greater than 1024 bytes
-        data = unmarshal(conn.recv(MAX_PACKET_SIZE))
+        print("Waiting to receive...")
+        data, address = server_socket.recvfrom(MAX_PACKET_SIZE)  # receive data from client
+        print("Received from: " + str(address))
+        data = unmarshal(data)
+
         if data:
           print(str(data))
       except socket.timeout:
@@ -78,14 +83,46 @@ def server_program(serverPort: int, end_time):
       # conn.send(data.encode())  # send data to the client
 
     try:
-      conn.close()  # close the connection
+      socket.close()  # close the connection
     except:
       pass
+
+# def server_program(serverPort: int, end_time):
+#     # get the hostname
+#     host = "192.168.188.117"
+#     port = 23456  # initiate port no above 1024
+
+#     server_socket = socket.socket()  # get instance
+#     # look closely. The bind() function takes tuple as argument
+#     print("Host: " + host)
+#     print("Port number: " + str(port))
+#     server_socket.bind((host, port))  # bind host address and port together
+
+#     # configure how many client the server can listen simultaneously
+#     server_socket.listen(1)
+#     while time.time() < end_time:
+#       server_socket.settimeout(end_time - time.time())
+#       try:
+#         conn, address = server_socket.accept()  # accept new connection
+#         print("Connection from: " + str(address))
+#         # receive data stream. it won't accept data packet greater than 1024 bytes
+#         data = unmarshal(conn.recv(MAX_PACKET_SIZE))
+#         if data:
+#           print(str(data))
+#       except socket.timeout:
+#         pass
+#       # data = input(' -> ')
+#       # conn.send(data.encode())  # send data to the client
+
+#     try:
+#       conn.close()  # close the connection
+#     except:
+#       pass
 
 def sendRequestSubscribe(serverIP: str, serverPort: int, request: bytes, marshalled_cancelData: bytes, interval: int):
   start_time = time.time()
   end_time = start_time + float(interval * 60)
-  with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+  with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
     s.connect((serverIP, serverPort))
     s.sendall(request)
     print("Subscribe Request Sent!")
